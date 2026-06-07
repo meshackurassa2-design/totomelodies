@@ -90,19 +90,12 @@ jobs:
       # ── 9. Pod install (signing fully disabled) ───────────────────────────
       - name: Install CocoaPods Dependencies
         run: |
+          ruby -e "
+          podfile = File.read('ios/App/Podfile')
+          patched = podfile.gsub('assertDeploymentTarget(installer)', \"assertDeploymentTarget(installer)\\n  installer.pods_project.targets.each do |t|\\n    t.build_configurations.each do |c|\\n      c.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'\\n      c.build_settings['CODE_SIGNING_ALLOWED']  = 'NO'\\n      c.build_settings['CODE_SIGN_IDENTITY']    = ''\\n    end\\n  end\")
+          File.write('ios/App/Podfile', patched)
+          "
           cd ios/App
-          cat >> Podfile << 'PODFILE_PATCH'
-
-          post_install do |installer|
-            installer.pods_project.targets.each do |t|
-              t.build_configurations.each do |c|
-                c.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
-                c.build_settings['CODE_SIGNING_ALLOWED']  = 'NO'
-                c.build_settings['CODE_SIGN_IDENTITY']    = ''
-              end
-            end
-          end
-          PODFILE_PATCH
           pod install
 
       # ── 10. Build ─────────────────────────────────────────────────────────
