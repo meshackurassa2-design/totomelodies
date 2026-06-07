@@ -3051,3 +3051,47 @@ body.video-playing .nf-nav {
     pointer-events: none !important;
     visibility: hidden !important;
 }
+
+/* ===================== FINAL FIXES (DO NOT REMOVE) ===================== */
+
+/* 1. Back button top bar ALWAYS visible during video - Netflix style */
+.nf-player-bar-top {
+    opacity: 1 !important;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent) !important;
+    z-index: 9999 !important;
+}
+
+/* 2. Hide video controls (play/pause bar) after timeout, NOT the back button */
+.nf-player-overlay:not(.show-ui) .nf-player-controls,
+.nf-player-overlay:not(.show-ui) .nf-center-controls {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 3. Fix: content hidden under nav on scroll - add enough top padding to pages */
+#page-home {
+    padding-top: 0;
+}
+.inner-page {
+    padding-top: calc(68px + env(safe-area-inset-top) + 20px) !important;
+}
+#page-search .inner-page,
+#page-games .inner-page,
+#page-profile-settings .inner-page,
+#page-admin-dashboard .inner-page {
+    padding-top: calc(68px + env(safe-area-inset-top) + 20px) !important;
+}
+
+/* 4. Bottom padding so content is not hidden under bottom nav */
+#page-home .nf-rows,
+.nf-rows {
+    padding-bottom: 120px !important;
+}
+
+/* 5. Hide navs during game too */
+body.game-playing .nf-nav,
+body.game-playing #main-nav,
+body.game-playing .nf-bottom-nav {
+    display: none !important;
+    visibility: hidden !important;
+}

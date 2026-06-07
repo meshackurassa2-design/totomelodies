@@ -313,8 +313,15 @@ function openVideoPlayer(url, title, videoId) {
     if (titleEl) titleEl.textContent = title || '';
     overlay.classList.add('active');
     document.body.classList.add('video-playing');
+
+    // NETFLIX STYLE: directly hide nav bars when video opens
+    const mainNav = document.getElementById('main-nav');
+    const bottomNav = document.querySelector('.nf-bottom-nav');
+    if (mainNav) mainNav.style.display = 'none';
+    if (bottomNav) bottomNav.style.display = 'none';
+
     showPlayerUI();
-    
+
     video.onloadedmetadata = () => {
         if (videoId) {
             const saved = getSavedProgress()[videoId];
@@ -334,7 +341,13 @@ function closeVideoPlayer() {
     const video = document.getElementById('main-video-player');
     if (overlay) overlay.classList.remove('active', 'show-ui');
     document.body.classList.remove('video-playing');
-    
+
+    // NETFLIX STYLE: restore nav bars when video closes
+    const mainNav = document.getElementById('main-nav');
+    const bottomNav = document.querySelector('.nf-bottom-nav');
+    if (mainNav) mainNav.style.display = '';
+    if (bottomNav) bottomNav.style.display = '';
+
     if (video) {
         if (currentVideoPlayingId && video.currentTime > 0) {
             saveVideoProgress(currentVideoPlayingId, video.currentTime, video.duration);
@@ -342,7 +355,7 @@ function closeVideoPlayer() {
         video.pause();
         video.src = '';
     }
-    
+
     if (typeof renderVideoRows === 'function' && typeof videosList !== 'undefined') {
         renderVideoRows(videosList);
     }
@@ -401,8 +414,10 @@ function toggleFullscreen() {
 
 function showPlayerUI() {
     const overlay = document.getElementById('video-player-overlay');
+    // Show all controls temporarily
     overlay.classList.add('show-ui');
     clearTimeout(playerHideTimer);
+    // After 3 seconds, hide controls BUT keep back button bar visible always
     playerHideTimer = setTimeout(() => overlay.classList.remove('show-ui'), 3000);
 }
 
