@@ -235,13 +235,6 @@ function showPage(page) {
 
     const nav = document.getElementById('main-nav');
     const bottomNav = document.querySelector('.nf-bottom-nav');
-    if (page === 'home') {
-        if (nav) nav.style.display = 'flex';
-        if (bottomNav) bottomNav.style.display = 'flex';
-    } else {
-        if (nav) nav.style.display = 'none';
-        if (bottomNav) bottomNav.style.display = 'none';
-    }
 
     document.querySelectorAll('.nf-nav-link, .nf-mobile-link, .nf-bottom-link').forEach(l => {
         l.classList.toggle('active', l.dataset.page === page);

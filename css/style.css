@@ -720,6 +720,7 @@ body.hide-navs .nf-nav, body.hide-navs .nf-bottom-nav {
     cursor: pointer;
 }
 .nf-player-title {
+    display: none !important;
     font-size: 1.1rem;
     font-weight: 700;
     color: white;
@@ -2029,7 +2030,8 @@ input, textarea {
 
 /* ===================== MOBILE BOTTOM NAVIGATION ===================== */
 body.video-playing .nf-bottom-nav,
-body.game-playing .nf-bottom-nav {
+body.game-playing .nf-bottom-nav,
+body.video-playing .nf-nav {
     display: none !important;
 }
 
