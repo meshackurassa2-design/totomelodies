@@ -1,0 +1,21 @@
+{
+  "name": "TotoMelodies",
+  "short_name": "TotoMelodies",
+  "description": "Watch, Learn and Play. The best kids entertainment platform.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#e50914",
+  "icons": [
+    {
+      "src": "./assets/lion_mascot_1779138323522.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/lion_mascot_1779138323522.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

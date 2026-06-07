@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TotoMelodies | Kids Entertainment</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="description" content="TotoMelodies - Watch, Learn and Play. The best kids entertainment platform.">
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===================== LOADING SPLASH (Prevents Flash) ===================== -->
+<div id="global-splash" style="position:fixed; inset:0; z-index:99999; background:var(--nf-black); display:flex; align-items:center; justify-content:center;">
+    <div style="color:#e50914; font-size:3rem; font-weight:900; letter-spacing:-1px; animation: pulse 1.5s infinite;">TOTOMELODIES</div>
+</div>
+<style>
+@keyframes pulse { 0% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.5; transform: scale(0.95); } }
+</style>
+
+<!-- ===================== AUTH SCREEN (Real Supabase Login) ===================== -->
+<div class="auth-screen hidden" id="auth-screen">
+    <div class="auth-bg">
+        <div class="auth-bg-overlay"></div>
+    </div>
+    <div class="auth-card">
+        <div class="auth-logo">TotoMelodies</div>
+
+        <!-- Login Form -->
+        <div class="auth-form" id="auth-login-form">
+            <h2>Sign In</h2>
+            <div class="auth-input-group">
+                <input type="email" id="login-email" class="auth-input" placeholder="Email address" autocomplete="email">
+            </div>
+            <div class="auth-input-group">
+                <input type="password" id="login-password" class="auth-input" placeholder="Password" autocomplete="current-password">
+                <button class="auth-pw-toggle" type="button" onclick="togglePw('login-password', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+            <div class="auth-error" id="login-error"></div>
+            <button class="auth-btn" id="login-btn" onclick="handleLogin()">Sign In</button>
+            <div class="auth-divider"><span>OR</span></div>
+            <p class="auth-switch">New to TotoMelodies? <a onclick="switchAuthForm('signup')">Create an account.</a></p>
+            
+            <div style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px; text-align: center;">
+                <p style="color: #fff; font-size: 0.95rem; margin-bottom: 12px;">Need an activation key? Contact Admin:</p>
+                <a href="https://wa.me/255765450573?text=naombe%20uni%20activate%20account" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; font-size: 0.95rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    Contact via WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div class="auth-form" id="auth-signup-form" style="display:none;">
+            <h2>Create Account</h2>
+            <div class="auth-input-group">
+                <input type="text" id="signup-name" class="auth-input" placeholder="Your name" autocomplete="name">
+            </div>
+            <div class="auth-input-group">
+                <input type="email" id="signup-email" class="auth-input" placeholder="Email address" autocomplete="email">
+            </div>
+            <div class="auth-input-group">
+                <input type="password" id="signup-password" class="auth-input" placeholder="Password (min 6 characters)" autocomplete="new-password">
+                <button class="auth-pw-toggle" type="button" onclick="togglePw('signup-password', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+            <div class="auth-error" id="signup-error"></div>
+            <button class="auth-btn" id="signup-btn" onclick="handleSignup()">Create Account</button>
+            <div class="auth-divider"><span>OR</span></div>
+            <p class="auth-switch">Already have an account? <a onclick="switchAuthForm('login')">Sign in.</a></p>
+            
+            <div style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px; text-align: center;">
+                <p style="color: #fff; font-size: 0.95rem; margin-bottom: 12px;">Need an activation key? Contact Admin:</p>
+                <a href="https://wa.me/255765450573?text=naombe%20uni%20activate%20account" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; font-size: 0.95rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    Contact via WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== NETFLIX-STYLE TOP NAV ===================== -->
+<nav class="nf-nav" id="main-nav">
+    <div class="nf-nav-left">
+        <div class="nf-logo" onclick="showPage('home')">TotoMelodies</div>
+        <ul class="nf-nav-links" id="nav-links">
+            <li class="nf-nav-link active" data-page="home" onclick="showPage('home')">Home</li>
+            <li class="nf-nav-link" data-page="games" onclick="showPage('games')">Michezo</li>
+
+            <li class="nf-nav-link" data-page="stories" onclick="showPage('stories')">Stories</li>
+            <li id="nav-admin-link" class="nf-nav-link" data-page="admin" onclick="showPage('admin-dashboard')" style="display:none; color:#e50914; font-weight:bold;">Admin</li>
+        </ul>
+    </div>
+    <div class="nf-nav-right">
+        <div class="nf-search-btn" onclick="toggleSearch()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <div class="nf-avatar-wrap" id="nf-user-avatar">
+            <div class="nf-avatar" onclick="showPage('profile-settings'); populateProfileSettings()">
+                <img src="assets/lion_mascot_1779138323522.png" alt="Profile" id="nav-avatar-img">
+                <svg class="nf-avatar-caret" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div class="nf-avatar-menu" id="avatar-menu">
+                <div class="nf-avatar-menu-item" onclick="showPage('profiles'); closeAvatarMenu()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Switch Profile
+                </div>
+                <div class="nf-avatar-menu-divider"></div>
+                <div class="nf-avatar-menu-item nf-avatar-menu-signout" onclick="handleSignOut()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign Out
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    
+
+<!-- ===================== SEARCH BAR ===================== -->
+<div class="nf-search-bar" id="search-bar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" id="search-input" placeholder="Titles, people, genres" oninput="handleSearch(this.value)">
+    <button onclick="closeSearch()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+</div>
+
+<!-- ===================== PAGE: WHO'S WATCHING (PROFILES) ===================== -->
+<div class="nf-page" id="page-profiles" style="display:none;">
+    <!-- View: Select Profile -->
+    <div class="profiles-screen" id="profiles-select-view">
+        <h1 class="profiles-title">Who's watching?</h1>
+        <div class="profiles-grid" id="dynamic-profiles-grid">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+    <div class="profiles-screen" id="profiles-create-view" style="display:none; align-items: center; justify-content: center; background: url('assets/bg.jpg') center/cover no-repeat; position: fixed; inset: 0; z-index: 10000;">
+        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.7);"></div>
+        <div class="create-profile-box">
+            <h1 style="font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Create Profile</h1>
+            <p style="color: #bbb; margin-bottom: 30px; font-size: 1.1rem;">Customize your TotoMelodies experience.</p>
+            
+            <img id="selected-avatar-preview" src="assets/lion_mascot_1779138323522.png" alt="Selected Avatar" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #e50914; margin-bottom: 20px; box-shadow: 0 0 20px rgba(229,9,20,0.4);">
+            
+            <input type="text" id="create-profile-name" class="cp-input" placeholder="Enter your name" maxlength="15">
+            
+            <div id="create-profile-error" class="auth-error" style="margin-bottom: 20px;"></div>
+            
+            <p style="color: #fff; font-size: 1.1rem; margin-bottom: 15px; font-weight: 600;">Choose an Avatar</p>
+            <div class="cp-avatars" style="display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap;">
+                <div class="cp-avatar-opt selected" data-avatar="lion" onclick="selectCreateAvatar('lion', this)" style="width: 60px; height: 60px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.3s;"><img src="assets/lion_mascot_1779138323522.png" alt="Lion" style="width:100%; height:100%; object-fit:cover; border-radius: 50%;"></div>
+                <div class="cp-avatar-opt" data-avatar="elephant" onclick="selectCreateAvatar('elephant', this)" style="width: 60px; height: 60px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.3s;"><img src="assets/transparent_elephant_1780219301774.png" alt="Elephant" style="width:100%; height:100%; object-fit:cover; border-radius: 50%;"></div>
+                <div class="cp-avatar-opt" data-avatar="giraffe" onclick="selectCreateAvatar('giraffe', this)" style="width: 60px; height: 60px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.3s;"><img src="assets/giraffe_mascot_1780220554293.png" alt="Giraffe" style="width:100%; height:100%; object-fit:cover; border-radius: 50%;"></div>
+                <div class="cp-avatar-opt" data-avatar="monkey" onclick="selectCreateAvatar('monkey', this)" style="width: 60px; height: 60px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.3s;"><img src="assets/monkey_mascot_1780220566411.png" alt="Monkey" style="width:100%; height:100%; object-fit:cover; border-radius: 50%;"></div>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="save-profile-btn" onclick="saveNewProfile()" style="background: #e50914; color: #fff; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.3s;">Continue</button>
+                <button onclick="cancelCreateProfile()" style="background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.3s;">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: ACTIVATION ===================== -->
+<div class="nf-page" id="page-activation" style="display:none; align-items: center; justify-content: center; height: 100vh; background: #141414;">
+    <div style="text-align: center; max-width: 400px; padding: 40px; background: rgba(0,0,0,0.75); border-radius: 8px; margin: 0 auto; margin-top: 100px;">
+        <h2 style="color: #fff; margin-bottom: 10px;">Activate Account</h2>
+        <p style="color: #8c8c8c; margin-bottom: 20px; font-size: 0.95rem;">Your subscription has expired or is not active. Please enter a valid activation code to get 1 month access.</p>
+        <input type="text" id="activation-code-input" placeholder="e.g. TOTO-1234-ABCD" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 4px; border: none; background: #333; color: #fff; text-align: center; font-size: 1.1rem; text-transform: uppercase; box-sizing: border-box;">
+        <div id="activation-error" class="auth-error" style="margin-bottom: 15px;"></div>
+        <button id="activation-btn" onclick="submitActivationCode()" style="width: 100%; padding: 12px; background: #e50914; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;">Activate Subscription</button>
+        
+        <div style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px;">
+            <p style="color: #fff; font-size: 0.95rem; margin-bottom: 12px;">Need an activation key? Contact Admin:</p>
+            <a href="https://wa.me/255765450573?text=naombe%20uni%20activate%20account" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; font-size: 0.95rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                Contact via WhatsApp
+            </a>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <a href="#" onclick="handleSignOut()" style="color: #8c8c8c; font-size: 0.9rem; text-decoration: none;">Sign Out</a>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: ONBOARDING (Taste Profile) ===================== -->
+<!-- ===================== PAGE: ONBOARDING (Taste Profile) ===================== -->
+<div class="nf-page" id="page-onboarding" style="display:none;">
+    <div class="onboarding-screen">
+        <div class="onboarding-header">
+            <h2>Choose 3 or more you like</h2>
+        </div>
+        <div class="onboarding-grid" id="onboarding-grid">
+            <!-- Populated by JS -->
+        </div>
+        <div class="onboarding-footer">
+            <button class="onboarding-continue-btn" id="onboarding-continue-btn" onclick="finishOnboarding()" disabled>Continue</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===================== PAGE: HOME ===================== -->
+<div class="nf-page" id="page-home" style="display:none;">
+    <!-- Billboard Hero -->
+    <div class="nf-billboard" id="billboard">
+        <div class="billboard-bg">
+            <img src="assets/lion_mascot_1779138323522.png" alt="Featured" id="billboard-img">
+            <div class="billboard-gradient-bottom"></div>
+            <div class="billboard-gradient-side"></div>
+        </div>
+        <div class="billboard-content">
+            <div class="billboard-logo" id="billboard-logo">TotoMelodies</div>
+            <div class="billboard-meta" id="billboard-meta">
+                <span class="bb-match">98% Match</span>
+                <span class="bb-year">2024</span>
+                <span class="bb-rating">G</span>
+            </div>
+            <p class="billboard-synopsis" id="billboard-synopsis">The most exciting kids entertainment â€” songs, stories, cartoons and more!</p>
+            <div class="billboard-actions">
+                <button class="nf-btn nf-btn-play" id="billboard-play-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Play
+                </button>
+                <button class="nf-btn nf-btn-info" id="billboard-info-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    More Info
+                </button>
+            </div>
+        </div>
+        <div class="billboard-dots-wrap">
+            <div class="billboard-dots" id="billboard-dots"></div>
+        </div>
+        <div class="billboard-maturity">
+            <span class="maturity-rating">G</span>
+        </div>
+    </div>
+
+    <!-- Video Rows -->
+    <div class="nf-rows" id="video-rows-container">
+        <div class="nf-loading">
+            <div class="nf-spinner"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: GAMES ===================== -->
+<div class="nf-page" id="page-games" style="display:none;">
+    <div class="inner-page">
+        <h2 class="page-title">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line></svg>
+            Michezo
+        </h2>
+        <div class="games-grid">
+            <div class="game-card" onclick="openGame('balloon')">
+                <img src="assets/game_puto_pop.png" class="game-card-art" style="width: 100%; object-fit: cover; border-bottom: none; display: block; border-radius: 4px 4px 0 0;" alt="Puto Pop">
+                <div class="game-card-info">
+                    <h3>Puto Pop</h3>
+                    <p>Burst as many balloons as you can!</p>
+                    <button class="nf-btn nf-btn-play" onclick="event.stopPropagation();openGame('balloon')" style="margin-top:12px; font-size:0.9rem; padding:8px 18px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        Play
+                    </button>
+                </div>
+            </div>
+            <div class="game-card" onclick="openGame('shape')">
+                <img src="assets/game_panga_maumbo.png" class="game-card-art" style="width: 100%; object-fit: cover; border-bottom: none; display: block; border-radius: 4px 4px 0 0;" alt="Panga Maumbo">
+                <div class="game-card-info">
+                    <h3>Panga Maumbo</h3>
+                    <p>Match shapes to their correct places!</p>
+                    <button class="nf-btn nf-btn-play" onclick="event.stopPropagation();openGame('shape')" style="margin-top:12px; font-size:0.9rem; padding:8px 18px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        Play
+                    </button>
+                </div>
+            </div>
+            <div class="game-card" onclick="openGame('music')">
+                <img src="assets/game_studio_muziki.png" class="game-card-art" style="width: 100%; object-fit: cover; border-bottom: none; display: block; border-radius: 4px 4px 0 0;" alt="Studio ya Muziki">
+                <div class="game-card-info">
+                    <h3>Studio ya Muziki</h3>
+                    <p>Piano, drums and xylophone Ã¢â‚¬â€ make music!</p>
+                    <button class="nf-btn nf-btn-play" onclick="event.stopPropagation();openGame('music')" style="margin-top:12px; font-size:0.9rem; padding:8px 18px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        Play
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: SEARCH RESULTS ===================== -->
+<div class="nf-page" id="page-search" style="display:none;">
+    <div class="inner-page">
+        <h2 class="page-title">Search Results</h2>
+        <div class="search-results-grid" id="search-results-grid"></div>
+    </div>
+</div>
+
+<!-- ===================== VIDEO PLAYER OVERLAY ===================== -->
+<div class="nf-player-overlay" id="video-player-overlay">
+    <div class="nf-player-bar nf-player-bar-top" id="player-top-bar">
+        <button class="nf-player-back" onclick="closeVideoPlayer()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+        </button>
+        <span class="nf-player-title" id="player-title-text"></span>
+    </div>
+    <video id="main-video-player" playsinline>
+        <source src="" type="video/mp4">
+    </video>
+    <div id="video-loading-spinner" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); z-index:9010; pointer-events:none;">
+        <div class="nf-spinner" style="width: 50px; height: 50px; border-width: 4px; border-top-color: #e50914;"></div>
+    </div>
+
+    <div class="nf-center-controls">
+        <button class="nf-center-btn" onclick="skipBackward()">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="white"><path d="M12.5 3a9.5 9.5 0 1 0 9.5 9.5"/><path d="M15.5 1h-6l3-3z"/><text x="7" y="14" font-size="6" fill="white">10</text></svg>
+        </button>
+        <button class="nf-center-btn nf-play-btn" id="play-pause-btn" onclick="togglePlayPause()">
+            <svg id="play-icon" width="64" height="64" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <svg id="pause-icon" width="64" height="64" viewBox="0 0 24 24" fill="white" style="display:none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+        </button>
+        <button class="nf-center-btn" onclick="skipForward()">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="white"><path d="M11.5 3a9.5 9.5 0 1 1-9.5 9.5"/><path d="M8.5 1h6l-3-3z"/><text x="9" y="14" font-size="6" fill="white">10</text></svg>
+        </button>
+    </div>
+
+    <div class="nf-player-controls" id="player-controls">
+        <div class="nf-controls-row">
+            <span class="nf-time" id="player-time">0:00 / 0:00</span>
+            <div class="nf-controls-right" style="position: relative;">
+                <button class="nf-ctrl-btn hide-on-mobile" onclick="toggleMute()" id="volume-btn">
+                    <svg id="vol-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                </button>
+                <button class="nf-ctrl-btn" onclick="toggleQualityMenu()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+                <div class="nf-quality-menu" id="quality-menu">
+                    <div class="nf-quality-header">Quality</div>
+                    <div class="nf-quality-option active" onclick="selectQuality('Auto')">Auto</div>
+                    <div class="nf-quality-option" onclick="selectQuality('1080p')">1080p HD</div>
+                    <div class="nf-quality-option" onclick="selectQuality('720p')">720p</div>
+                    <div class="nf-quality-option" onclick="selectQuality('480p')">480p Data Saver</div>
+                </div>
+                <button class="nf-ctrl-btn" onclick="toggleFullscreen()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                </button>
+            </div>
+        </div>
+        <div class="nf-progress-bar" id="progress-bar-container" onclick="seekVideo(event)">
+            <div class="nf-progress-fill" id="progress-fill"></div>
+            <div class="nf-progress-thumb" id="progress-thumb"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===================== GAME OVERLAYS ===================== -->
+<!-- Balloon Game -->
+<div class="nf-game-overlay" id="game-balloon-overlay">
+        <div class="landscape-prompt">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                <rect x="7" y="2" width="10" height="16" rx="2"/>
+                <path d="M2 9l3-3 3 3M5 6v6"/>
+            </svg>
+            <p style="font-weight:700; font-size:1.3rem;">Rotate Your Phone</p>
+            <p style="color:#aaa; font-size:0.95rem;">Please turn your phone sideways for the best experience!</p>
+        </div>
+    <div class="nf-game-header">
+        <button class="nf-game-back" onclick="closeGame('balloon')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+        </button>
+        <h3>Puto Pop</h3>
+        <div class="nf-score-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span id="score-display">0</span>
+        </div>
+    </div>
+    <div id="balloon-playground"></div>
+</div>
+
+<!-- Shape Game -->
+<div class="nf-game-overlay" id="game-shape-overlay">
+        <div class="landscape-prompt">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                <rect x="7" y="2" width="10" height="16" rx="2"/>
+                <path d="M2 9l3-3 3 3M5 6v6"/>
+            </svg>
+            <p style="font-weight:700; font-size:1.3rem;">Rotate Your Phone</p>
+            <p style="color:#aaa; font-size:0.95rem;">Please turn your phone sideways for the best experience!</p>
+        </div>
+    <div class="nf-game-header">
+        <button class="nf-game-back" onclick="closeGame('shape')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+        </button>
+        <h3>Panga Maumbo</h3>
+    </div>
+    <div id="shape-playground">
+        <div class="shape-targets" id="shape-targets-container"></div>
+        <div class="draggables" id="shape-draggables-container"></div>
+    </div>
+</div>
+
+<!-- Music Studio -->
+<div class="nf-game-overlay" id="game-music-overlay">
+        <div class="landscape-prompt">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                <rect x="7" y="2" width="10" height="16" rx="2"/>
+                <path d="M2 9l3-3 3 3M5 6v6"/>
+            </svg>
+            <p style="font-weight:700; font-size:1.3rem;">Rotate Your Phone</p>
+            <p style="color:#aaa; font-size:0.95rem;">Please turn your phone sideways for the best experience!</p>
+        </div>
+    <div class="nf-game-header">
+        <button class="nf-game-back" onclick="closeGame('music')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+        </button>
+        <h3>Studio ya Muziki</h3>
+        <div class="instrument-tabs">
+            <button class="inst-tab active" id="tab-piano" onclick="switchInstrument('piano', this)">Piano</button>
+            <button class="inst-tab" id="tab-drums" onclick="switchInstrument('drums', this)">Ngoma</button>
+            <button class="inst-tab" id="tab-xylo" onclick="switchInstrument('xylo', this)">Marimba</button>
+        </div>
+    </div>
+    <div id="music-playground">
+        <div id="piano-container" class="instrument-view active">
+            <div class="song-bar">
+                <select id="song-selector" class="song-select"></select>
+                <button class="nf-btn nf-btn-play" onclick="autoPlaySelectedSong()" style="font-size:0.9rem; padding:8px 18px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Play Song
+                </button>
+            </div>
+            <div class="piano-keys" id="piano-keys-wrapper"></div>
+        </div>
+        <div id="drums-container" class="instrument-view">
+            <div class="drum-pads" id="drum-pads-wrapper"></div>
+        </div>
+        <div id="xylo-container" class="instrument-view">
+            <div class="xylo-bars" id="xylo-bars-wrapper"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== ANIMAL INFO MODAL ===================== -->
+<div class="nf-modal-overlay" id="animal-modal">
+    <div class="nf-modal">
+        <button class="nf-modal-close" onclick="closeAnimalModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="nf-modal-hero" id="modal-hero-img"></div>
+        <div class="nf-modal-body">
+            <h2 id="modal-animal-name"></h2>
+            <p id="modal-animal-fact"></p>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== VIDEO DETAIL MODAL (Netflix More Info) ===================== -->
+<div class="nf-detail-overlay" id="video-detail-modal">
+    <div class="nf-detail-panel nf-detail-mobile-layout">
+        <div class="nf-detail-header-img">
+            <img id="detail-backdrop" src="" alt="">
+            <div class="nf-detail-header-controls">
+                <button class="nf-detail-close" onclick="closeDetailModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="nf-detail-body">
+            <div class="nf-detail-brand"><span style="color: #e50914; font-weight: 800; margin-right: 5px; font-size: 1.1rem;">N</span> <span style="letter-spacing: 2px; font-size: 0.75rem; color: #aaa; font-weight: 600;">FILM</span></div>
+            <h2 class="nf-detail-title-mobile" id="detail-title"></h2>
+            
+            <div class="nf-detail-meta-mobile">
+                <span class="nf-detail-year" id="detail-year">2024</span>
+                <span class="nf-detail-rating" id="detail-rating">G</span>
+                <span class="nf-detail-duration" id="detail-duration">1h 30m</span>
+                <span class="nf-detail-hd">HD</span>
+            </div>
+            
+            <button class="nf-btn-block nf-btn-play-block" id="detail-play-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Play
+            </button>
+            <button class="nf-btn-block nf-btn-download-block" id="detail-download-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download
+            </button>
+            
+            <div class="nf-detail-progress" id="detail-progress-container" style="display:none;">
+                <div class="nf-detail-progress-bar"><div class="nf-detail-progress-fill" id="detail-progress-fill"></div></div>
+                <div class="nf-detail-time-left" id="detail-time-left"></div>
+            </div>
+            
+            <p class="nf-detail-description-mobile" id="detail-description"></p>
+            <div class="nf-detail-cast">Cast: <span id="detail-cast">Toto, Simba, Ndovu</span></div>
+            <div class="nf-detail-director">Director: <span id="detail-director">TotoMelodies Studios</span></div>
+            
+            <div class="nf-detail-action-bar">
+                <div class="nf-action-item" id="detail-watchlist-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>My List</span>
+                </div>
+                <div class="nf-action-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"></path><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    <span>Rate</span>
+                </div>
+                <div class="nf-action-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <span>Share</span>
+                </div>
+            </div>
+            
+            <div class="nf-detail-tabs">
+                <div class="nf-tab active">More Like This</div>
+                <div class="nf-tab">Trailers</div>
+            </div>
+            
+            <div class="nf-detail-similar-mobile">
+                <div class="nf-similar-grid-mobile" id="detail-similar-grid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+            <!-- View: Profile Settings -->
+    <div class="nf-page" id="page-profile-settings" style="display:none; padding-top: 100px; max-width: 600px; margin: 0 auto; color: #fff; text-align: center;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 30px;">Profile Settings</h1>
+        
+        <div style="background: #181818; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="margin-bottom: 30px;">
+                <img id="settings-avatar-img" src="" style="width: 120px; height: 120px; border-radius: 12px; object-fit: cover; border: 3px solid #e50914; margin-bottom: 15px;">
+                <h2 id="settings-profile-name" style="font-size: 1.5rem; margin-bottom: 5px;"></h2>
+                <p id="settings-account-email" style="color: #888;"></p>
+                <div id="subscription-status-box" style="margin-top: 20px; padding: 15px; background: rgba(229,9,20,0.1); border: 1px solid rgba(229,9,20,0.5); border-radius: 8px; text-align: center;">
+                    <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 5px;">Subscription expires in:</p>
+                    <h3 id="subscription-countdown" style="color: #e50914; font-size: 1.3rem; margin: 0; font-family: monospace;">Loading...</h3>
+                </div>
+            </div>
+            
+            <h3 style="margin-bottom: 15px; text-align: left; border-bottom: 1px solid #333; padding-bottom: 10px;">Change Avatar</h3>
+            <div id="settings-avatar-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 15px; margin-bottom: 40px;">
+                <!-- Avatars injected via JS -->
+            </div>
+            
+            <button onclick="handleSignOut()" style="width: 100%; background: transparent; color: #e50914; border: 2px solid #e50914; padding: 15px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s;">Sign Out Completely</button>
+        </div>
+    </div>
+
+    <!-- View: Admin Dashboard -->
+    <div class="nf-page" id="page-admin-dashboard" style="display:none; padding-top: 100px; max-width: 900px; margin: 0 auto; color: #fff; padding-bottom: 50px;">
+        <div class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <p>Manage content and activation codes</p>
+        </div>
+
+        <div style="background: #181818; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h2>Generate Activation Code</h2>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Generate a new code for 1 month validation.</p>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="adminGenerateCode()" style="background: #e50914; color: #fff; border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer;">Generate Code</button>
+                <input type="text" id="admin-generated-code" readonly placeholder="Code will appear here" style="flex: 1; padding: 10px; border: 1px solid #333; background: #222; color: #46d369; font-family: monospace; font-size: 1.1rem; border-radius: 4px;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('admin-generated-code').value)" style="background: #333; color: #fff; border: none; padding: 10px; border-radius: 4px; cursor: pointer;" title="Copy to clipboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+            </div>
+            <div id="admin-code-msg" style="margin-top: 10px; color: #e87c03; font-size: 0.9rem;"></div>
+        </div>
+        
+        <div class="admin-grid">
+            <div class="admin-section">
+                <div class="admin-input-group">
+                    <label>Video Title</label>
+                    <input type="text" id="admin-video-title" placeholder="e.g. Kuhesabu 1 mpaka 10">
+                </div>
+                <div class="admin-input-group">
+                    <label>Description</label>
+                    <textarea id="admin-video-desc" placeholder="A short description..." rows="4"></textarea>
+                </div>
+                                <div class="admin-input-group">
+                    <label>Release Date</label>
+                    <input type="date" id="admin-video-date" style="color: #fff; background: #333; border: 1px solid #444; padding: 12px; border-radius: 4px; box-sizing: border-box; width: 100%; font-size: 1rem;">
+                </div>
+                <div class="admin-input-group">
+                    <label>Category</label>
+                    <select id="admin-video-category">
+                        <option value="Nyimbo Zetu">Nyimbo Zetu</option>
+                        <option value="Katuni">Katuni</option>
+                        <option value="Jifunze Pamoja">Jifunze Pamoja</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <div class="admin-input-group admin-dropzone-wrapper">
+                    <label>Video File (.mp4)</label>
+                    <div class="admin-dropzone" id="video-dropzone">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Drag & Drop or click to browse</span>
+                        <div class="file-name" id="video-file-name"></div>
+                        <input type="file" id="admin-video-file" accept="video/*" onchange="updateFileName(this, 'video-file-name')">
+                    </div>
+                </div>
+                
+                <div class="admin-input-group admin-dropzone-wrapper">
+                    <label>Thumbnail Image (.png, .jpg)</label>
+                    <div class="admin-dropzone" id="thumb-dropzone">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <span>Drag & Drop or click to browse</span>
+                        <div class="file-name" id="thumb-file-name"></div>
+                        <input type="file" id="admin-thumbnail-file" accept="image/*" onchange="updateFileName(this, 'thumb-file-name')">
+                    </div>
+                </div>
+            </div>
+            
+            <div id="admin-error-msg" class="auth-error" style="grid-column: 1 / -1; margin: 0; text-align: center;"></div>
+            <button onclick="submitAdminVideo()" class="admin-submit-btn">Upload Content</button>
+        </div>
+        
+        <hr style="border-color: #333; margin: 50px 0;">
+        <h2 style="font-size: 1.8rem; margin-bottom: 20px;">Recently Posted</h2>
+        <div id="admin-video-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+            <!-- Admin's videos will appear here -->
+        </div>
+    </div>
+
+          <!-- ===================== MOBILE BOTTOM NAVIGATION ===================== -->
+    <div class="nf-bottom-nav">
+        <div class="nf-bottom-link active" data-page="home" onclick="showPage('home')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </div>
+        <div class="nf-bottom-link" data-page="games" onclick="showPage('games')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg>
+            <span>Michezo</span>
+        </div>
+
+        <div class="nf-bottom-link" data-page="stories" onclick="showPage('stories')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+            <span>Stories</span>
+        </div>
+        <div class="nf-bottom-link" onclick="showPage('profile-settings'); populateProfileSettings()">
+            <img src="assets/lion_mascot_1779138323522.png" alt="Profile" id="bottom-nav-avatar-img">
+            <span>Profile</span>
+        </div>
+    </div>
+
+    <!-- ===================== PAGE: STORY BOOKS ===================== -->
+    <!-- ===================== PAGE: STORY BOOKS ===================== -->
+    <div class="nf-page" id="page-stories" style="display:none; padding-top: 80px; padding-bottom: 120px; color: #fff; position: relative;">
+        <!-- The bright joyful playroom background using CSS gradients -->
+        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, #a1c4fd 0%, #c2e9fb 100%); z-index: -2; overflow: hidden;">
+            <!-- Pure CSS fluffy clouds -->
+            <div style="position: absolute; width: 300px; height: 100px; background: #fff; border-radius: 100px; top: 10%; left: 10%; opacity: 0.9; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <div style="position: absolute; width: 120px; height: 120px; background: #fff; border-radius: 50%; top: -60px; left: 40px;"></div>
+                <div style="position: absolute; width: 150px; height: 150px; background: #fff; border-radius: 50%; top: -80px; left: 120px;"></div>
+            </div>
+            <div style="position: absolute; width: 250px; height: 80px; background: #fff; border-radius: 100px; top: 25%; right: 5%; opacity: 0.8; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <div style="position: absolute; width: 100px; height: 100px; background: #fff; border-radius: 50%; top: -50px; left: 30px;"></div>
+                <div style="position: absolute; width: 120px; height: 120px; background: #fff; border-radius: 50%; top: -60px; left: 100px;"></div>
+            </div>
+            <div style="position: absolute; width: 400px; height: 120px; background: #fff; border-radius: 100px; bottom: 5%; left: 50%; transform: translateX(-50%); opacity: 0.7; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <div style="position: absolute; width: 160px; height: 160px; background: #fff; border-radius: 50%; top: -80px; left: 60px;"></div>
+                <div style="position: absolute; width: 200px; height: 200px; background: #fff; border-radius: 50%; top: -100px; left: 180px;"></div>
+            </div>
+        </div>
+        
+        <div style="position: relative; z-index: 1; text-align: center; margin-bottom: 60px; padding: 0 20px;">
+            <h1 style="font-size: 4rem; font-weight: 900; color: #FF416C; text-shadow: 3px 3px 0px #fff, 6px 6px 0px rgba(0,0,0,0.1); margin-bottom: 10px; letter-spacing: 2px;">Ã°Å¸â€œÅ¡ Story Books</h1>
+            <p style="color: #333; font-size: 1.5rem; font-weight: bold; text-shadow: 2px 2px 0px #fff;">Pick a book and go on an adventure!</p>
+        </div>
+        
+        <div style="position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+            <div id="stories-shelf" class="magic-shelves-grid">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== BOOK READER ===================== -->
+    <div id="book-reader-overlay" style="display:none; position:fixed; inset:0; background: radial-gradient(circle at center, #d8a878 0%, #8c5a35 100%); z-index:200000; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 150px rgba(0,0,0,0.6);">
+        <!-- Wooden grain texture overlay -->
+        <div style="position: absolute; inset: 0; background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(0,0,0,0.04) 15px, rgba(0,0,0,0.04) 30px); pointer-events: none; z-index: -1;"></div>
+
+        <!-- Header bar -->
+        <div id="book-reader-header" style="position:absolute; top:0; left:0; right:0; padding: 15px 20px; display:flex; align-items:center; justify-content:space-between; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 10;">
+            <button onclick="closeBook()" style="background: rgba(255,255,255,0.1); border: none; color:#fff; padding: 10px 18px; border-radius: 20px; cursor:pointer; font-size: 1rem; display:flex; align-items:center; gap:8px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                Ã¢â€ Â Back
+            </button>
+            <div id="book-reader-title-bar" style="font-size: 1.1rem; font-weight: 700; color: #fff; text-align: center; flex:1; padding: 0 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+            <button onclick="readCurrentPageAloud()" id="read-aloud-btn" style="background: #e50914; border: none; color:#fff; padding: 10px 18px; border-radius: 20px; cursor:pointer; font-size: 1rem; display:flex; align-items:center; gap:8px; transition: background 0.2s; white-space: nowrap;" onmouseover="this.style.background='#c0070f'" onmouseout="this.style.background='#e50914'">
+                Ã°Å¸â€Å  Read to Me
+            </button>
+        </div>
+
+        <!-- The Book -->
+        <div id="book-stage" style="position: relative; width: 100%; max-width: 950px; padding: 80px 20px 100px; display: flex; align-items: center; justify-content: center;">
+            <div id="book-container" style="position: relative; width: 100%; max-width: 900px;">
+                <!-- Pages rendered by JS -->
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div id="book-nav" style="position: absolute; bottom: 0; left:0; right:0; padding: 15px 20px; display:flex; align-items:center; justify-content:space-between; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
+            <button id="book-prev-btn" onclick="bookPrevPage()" style="background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); color:#fff; padding: 12px 25px; border-radius: 25px; cursor:pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                Ã¢â€”â‚¬ Prev
+            </button>
+            <div id="book-page-indicator" style="color: #ccc; font-size: 1rem; font-weight: 600;"></div>
+            <button id="book-next-btn" onclick="bookNextPage()" style="background: #e50914; border: none; color:#fff; padding: 12px 25px; border-radius: 25px; cursor:pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='#c0070f'" onmouseout="this.style.background='#e50914'">
+                Next Ã¢â€“Â¶
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- ===================== ANIMAL STORY MODAL ===================== -->
+    <div id="animal-story-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100000; align-items:center; justify-content:center; padding: 20px;">
+        <div style="background: var(--nf-dark); border-radius: 16px; padding: 30px; max-width: 500px; width: 100%; text-align: center; position: relative; border: 2px solid #e50914; box-shadow: 0 10px 30px rgba(229,9,20,0.3);">
+            <button onclick="closeAnimalStory()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #fff; cursor: pointer;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div id="animal-story-emoji" style="margin-bottom: 20px;"></div>
+            <h2 id="animal-story-title" style="color: #fff; font-size: 2.5rem; margin-bottom: 15px; font-weight: 800;"></h2>
+            <p id="animal-story-text" style="color: #ccc; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px;"></p>
+            <button onclick="closeAnimalStory()" style="background: #e50914; color: #fff; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.3s;">Awesome!</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/songs.js"></script>
+    <script src="js/app.js?v=10"></script>
+</body>
+</html>
+
+

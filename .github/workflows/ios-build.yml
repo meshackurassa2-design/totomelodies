@@ -1,0 +1,164 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build iOS IPA
+    runs-on: macos-14
+
+    steps:
+      # ── 1. Source code ────────────────────────────────────────────────────
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # ── 2. Show available Xcode versions and pin to any Xcode 15.x ─────────
+      - name: Select Xcode 15.x
+        run: |
+          echo "=== All installed Xcode versions ==="
+          ls /Applications/ | grep Xcode || echo "No Xcode apps found"
+          
+          # Find any Xcode 15.x installation dynamically
+          XCODE15=$(ls /Applications/ | grep -E "^Xcode_15" | sort -r | head -1)
+          if [ -n "$XCODE15" ]; then
+            echo "Found: $XCODE15"
+            sudo xcode-select -switch "/Applications/$XCODE15"
+          else
+            echo "WARNING: No Xcode 15.x found. Trying Xcode_16 with iOS 17 SDK..."
+            XCODE16=$(ls /Applications/ | grep -E "^Xcode_16" | sort | head -1)
+            if [ -n "$XCODE16" ]; then
+              sudo xcode-select -switch "/Applications/$XCODE16"
+            else
+              echo "Using default Xcode"
+            fi
+          fi
+          
+          echo "=== Active Xcode ==="
+          xcodebuild -version
+          echo "=== Available iOS SDKs ==="
+          xcodebuild -showsdks | grep iphoneos || true
+
+      # ── 3. Node.js ────────────────────────────────────────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── 4. Capacitor ──────────────────────────────────────────────────────
+      - name: Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/cli@6 @capacitor/core@6 @capacitor/ios@6
+
+      # ── 5. Web assets ─────────────────────────────────────────────────────
+      - name: Prepare Web Directory
+        run: |
+          mkdir -p www
+          cp -r css js assets index.html www/
+          echo "=== www contents ==="
+          ls www/
+
+      # ── 6. Init Capacitor & add iOS ───────────────────────────────────────
+      - name: Initialize Capacitor & Add iOS
+        run: |
+          npx cap init "TotoMelodies" "com.meshackurassa2.totomelodies" --web-dir www
+          npx cap add ios
+
+      # ── 7. Privacy permission strings ─────────────────────────────────────
+      - name: Inject Privacy Permissions into Info.plist
+        run: |
+          PLIST="ios/App/App/Info.plist"
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'TotoMelodies needs camera access.'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription 'TotoMelodies needs camera access.'" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string 'TotoMelodies needs microphone access.'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :NSMicrophoneUsageDescription 'TotoMelodies needs microphone access.'" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'TotoMelodies needs photo library access.'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryUsageDescription 'TotoMelodies needs photo library access.'" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string 'TotoMelodies needs photo library access.'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryAddUsageDescription 'TotoMelodies needs photo library access.'" "$PLIST"
+
+      # ── 8. App icons ──────────────────────────────────────────────────────
+      - name: Generate App Icons
+        run: |
+          npm install @capacitor/assets --save-dev
+          npx @capacitor/assets generate --ios || true
+
+      # ── 9. Pod install (signing fully disabled) ───────────────────────────
+      - name: Install CocoaPods Dependencies
+        run: |
+          cd ios/App
+          cat >> Podfile << 'PODFILE_PATCH'
+
+          post_install do |installer|
+            installer.pods_project.targets.each do |t|
+              t.build_configurations.each do |c|
+                c.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+                c.build_settings['CODE_SIGNING_ALLOWED']  = 'NO'
+                c.build_settings['CODE_SIGN_IDENTITY']    = ''
+              end
+            end
+          end
+          PODFILE_PATCH
+          pod install
+
+      # ── 10. Build ─────────────────────────────────────────────────────────
+      - name: Build iOS App Binary
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            EXPANDED_CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE="" \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | tee "$GITHUB_WORKSPACE/build.log"
+
+      # ── 11. On failure: print last 100 lines of build log ─────────────────
+      - name: Print Build Log (on failure)
+        if: failure()
+        run: |
+          echo "=== LAST 100 LINES OF BUILD LOG ==="
+          tail -100 "$GITHUB_WORKSPACE/build.log" || echo "No build log found"
+
+      # ── 12. ldid fake-sign every Mach-O binary ────────────────────────────
+      - name: Sign App Bundle with ldid
+        run: |
+          brew install ldid
+          APP="$GITHUB_WORKSPACE/DerivedData/Build/Products/Release-iphoneos/App.app"
+          echo "=== App bundle ==="
+          ls "$APP"
+          find "$APP" -type f | while read -r f; do
+            if file "$f" | grep -q "Mach-O"; then
+              echo "Signing: $f"
+              ldid -S "$f" || true
+            fi
+          done
+          echo "✅ ldid signing done"
+
+      # ── 13. Package .ipa ──────────────────────────────────────────────────
+      - name: Package into IPA
+        run: |
+          APP="$GITHUB_WORKSPACE/DerivedData/Build/Products/Release-iphoneos/App.app"
+          mkdir -p "$GITHUB_WORKSPACE/ipa_out/Payload"
+          cp -r "$APP" "$GITHUB_WORKSPACE/ipa_out/Payload/"
+          cd "$GITHUB_WORKSPACE/ipa_out"
+          zip -r TotoMelodies-v1.0.ipa Payload
+          echo "✅ IPA: $(du -sh TotoMelodies-v1.0.ipa)"
+
+      # ── 14. Upload ────────────────────────────────────────────────────────
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: TotoMelodies-iOS-IPA
+          path: ${{ github.workspace }}/ipa_out/TotoMelodies-v1.0.ipa
+          retention-days: 30
