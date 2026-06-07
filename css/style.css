@@ -3030,3 +3030,24 @@ body.video-playing .nf-nav {
         margin-top: 5vh;
     }
 }
+
+/* ===================== BUG FIXES ===================== */
+/* Force keep top bar visible during video playback so Back button remains */
+.nf-player-bar-top {
+    opacity: 1 !important;
+}
+.nf-player-overlay:not(.show-ui) .nf-player-bar-top { 
+    background: transparent !important; 
+}
+
+/* Force hide all navigations when video plays */
+body.video-playing .nf-bottom-nav,
+body.game-playing .nf-bottom-nav,
+body.video-playing #main-nav,
+body.game-playing #main-nav,
+body.video-playing .nf-nav {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
