@@ -72,7 +72,7 @@ async function checkAndRouteUser() {
     if (childProfile) {
         // Apply it and go to home (or onboarding)
         applyProfile(childProfile);
-        const onbKey = 'totomelodies_onboarding_' + childProfile.avatar;
+        const onbKey = 'totomelodies_onboarding_done';
         if (localStorage.getItem(onbKey) === 'true') {
             showPage('home');
         } else {
@@ -92,7 +92,6 @@ function showAuthScreen() {
 
 function hideAuthScreen() {
     document.getElementById('auth-screen').classList.add('hidden');
-    document.getElementById('main-nav').style.display = 'flex';
 }
 
 async function handleLogin() {

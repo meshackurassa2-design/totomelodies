@@ -2,7 +2,7 @@
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TotoMelodies | Kids Entertainment</title>
     <link rel="manifest" href="manifest.json">
     <meta name="description" content="TotoMelodies - Watch, Learn and Play. The best kids entertainment platform.">
@@ -93,7 +93,7 @@
             <li class="nf-nav-link active" data-page="home" onclick="showPage('home')">Home</li>
             <li class="nf-nav-link" data-page="games" onclick="showPage('games')">Michezo</li>
 
-            <li class="nf-nav-link" data-page="stories" onclick="showPage('stories')">Stories</li>
+
             <li id="nav-admin-link" class="nf-nav-link" data-page="admin" onclick="showPage('admin-dashboard')" style="display:none; color:#e50914; font-weight:bold;">Admin</li>
         </ul>
     </div>
@@ -262,17 +262,7 @@
             Michezo
         </h2>
         <div class="games-grid">
-            <div class="game-card" onclick="openGame('balloon')">
-                <img src="assets/game_puto_pop.png" class="game-card-art" style="width: 100%; object-fit: cover; border-bottom: none; display: block; border-radius: 4px 4px 0 0;" alt="Puto Pop">
-                <div class="game-card-info">
-                    <h3>Puto Pop</h3>
-                    <p>Burst as many balloons as you can!</p>
-                    <button class="nf-btn nf-btn-play" onclick="event.stopPropagation();openGame('balloon')" style="margin-top:12px; font-size:0.9rem; padding:8px 18px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                        Play
-                    </button>
-                </div>
-            </div>
+
             <div class="game-card" onclick="openGame('shape')">
                 <img src="assets/game_panga_maumbo.png" class="game-card-art" style="width: 100%; object-fit: cover; border-bottom: none; display: block; border-radius: 4px 4px 0 0;" alt="Panga Maumbo">
                 <div class="game-card-info">
@@ -654,10 +644,7 @@
             <span>Michezo</span>
         </div>
 
-        <div class="nf-bottom-link" data-page="stories" onclick="showPage('stories')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-            <span>Stories</span>
-        </div>
+
         <div class="nf-bottom-link" onclick="showPage('profile-settings'); populateProfileSettings()">
             <img src="assets/lion_mascot_1779138323522.png" alt="Profile" id="bottom-nav-avatar-img">
             <span>Profile</span>
