@@ -33,6 +33,13 @@ async function initAuth() {
     // Hide the global splash screen now that we know the auth state
     const splash = document.getElementById('global-splash');
     if (splash) splash.style.display = 'none';
+    
+    // Hide the custom splash screen smoothly
+    const customSplash = document.getElementById('splash-screen');
+    if (customSplash) {
+        customSplash.style.opacity = '0';
+        setTimeout(() => { customSplash.style.display = 'none'; }, 500);
+    }
 
     if (!currentAuthUser) showAuthScreen();
 }
@@ -44,6 +51,10 @@ async function checkAndRouteUser() {
     const adminLink = document.getElementById('nav-admin-link');
     if (adminLink) {
         adminLink.style.display = isAdmin() ? 'list-item' : 'none';
+    }
+    const bottomAdminLink = document.getElementById('bottom-nav-admin-link');
+    if (bottomAdminLink) {
+        bottomAdminLink.style.display = isAdmin() ? 'flex' : 'none';
     }
 
     // 1. Check subscription status

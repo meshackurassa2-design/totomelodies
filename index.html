@@ -7,10 +7,15 @@
     <link rel="manifest" href="manifest.json">
     <meta name="description" content="TotoMelodies - Watch, Learn and Play. The best kids entertainment platform.">
     <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/splash.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- ===================== SPLASH SCREEN ===================== -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-text">TotoMelodies</div>
+    </div>
 
 <!-- ===================== LOADING SPLASH (Prevents Flash) ===================== -->
 <div id="global-splash" style="position:fixed; inset:0; z-index:99999; background:var(--nf-black); display:flex; align-items:center; justify-content:center;">
@@ -278,7 +283,7 @@
                 <img src="assets/game_studio_muziki.png" class="game-card-art" style="width: 100%; object-fit: cover; border-bottom: none; display: block; border-radius: 4px 4px 0 0;" alt="Studio ya Muziki">
                 <div class="game-card-info">
                     <h3>Studio ya Muziki</h3>
-                    <p>Piano, drums and xylophone Ã¢â‚¬â€ make music!</p>
+                    <p>Piano, drums and xylophone Ã¢â‚¬â€  make music!</p>
                     <button class="nf-btn nf-btn-play" onclick="event.stopPropagation();openGame('music')" style="margin-top:12px; font-size:0.9rem; padding:8px 18px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                         Play
@@ -359,6 +364,11 @@
 <!-- ===================== GAME OVERLAYS ===================== -->
 <!-- Balloon Game -->
 <div class="nf-game-overlay" id="game-balloon-overlay">
+    <button class="nf-player-back" onclick="closeGame('balloon')" style="position: absolute; top: 20px; left: 20px; z-index: 100; color: #fff; background: rgba(0,0,0,0.5); border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Back
+    </button>
+    <h2 style="position:absolute; top:20px; text-align:center; width:100%;">Pop the Balloons!</h2>
         <div class="landscape-prompt">
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
                 <rect x="7" y="2" width="10" height="16" rx="2"/>
@@ -368,10 +378,6 @@
             <p style="color:#aaa; font-size:0.95rem;">Please turn your phone sideways for the best experience!</p>
         </div>
     <div class="nf-game-header">
-        <button class="nf-game-back" onclick="closeGame('balloon')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            Back
-        </button>
         <h3>Puto Pop</h3>
         <div class="nf-score-badge">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -383,6 +389,11 @@
 
 <!-- Shape Game -->
 <div class="nf-game-overlay" id="game-shape-overlay">
+    <button class="nf-player-back" onclick="closeGame('shape')" style="position: absolute; top: 20px; left: 20px; z-index: 100; color: #fff; background: rgba(0,0,0,0.5); border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Back
+    </button>
+    <h2 style="position:absolute; top:20px; text-align:center; width:100%;">Match the Shapes!</h2>
         <div class="landscape-prompt">
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
                 <rect x="7" y="2" width="10" height="16" rx="2"/>
@@ -392,10 +403,6 @@
             <p style="color:#aaa; font-size:0.95rem;">Please turn your phone sideways for the best experience!</p>
         </div>
     <div class="nf-game-header">
-        <button class="nf-game-back" onclick="closeGame('shape')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            Back
-        </button>
         <h3>Panga Maumbo</h3>
     </div>
     <div id="shape-playground">
@@ -406,13 +413,6 @@
 
 <!-- Music Studio -->
 <div class="nf-game-overlay" id="game-music-overlay">
-        <div class="landscape-prompt">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-                <rect x="7" y="2" width="10" height="16" rx="2"/>
-                <path d="M2 9l3-3 3 3M5 6v6"/>
-            </svg>
-            <p style="font-weight:700; font-size:1.3rem;">Rotate Your Phone</p>
-            <p style="color:#aaa; font-size:0.95rem;">Please turn your phone sideways for the best experience!</p>
         </div>
     <div class="nf-game-header">
         <button class="nf-game-back" onclick="closeGame('music')">
@@ -648,6 +648,10 @@
         <div class="nf-bottom-link" onclick="showPage('profile-settings'); populateProfileSettings()">
             <img src="assets/lion_mascot_1779138323522.png" alt="Profile" id="bottom-nav-avatar-img">
             <span>Profile</span>
+        </div>
+        <div class="nf-bottom-link" id="bottom-nav-admin-link" style="display:none;" onclick="showPage('admin-dashboard')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span style="color:#e50914;">Admin</span>
         </div>
     </div>
 
