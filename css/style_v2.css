@@ -665,7 +665,7 @@ body.hide-navs .nf-nav, body.hide-navs .nf-bottom-nav {
 .nf-player-bar-top {
     position: absolute;
     top: 0; left: 0; width: 100%;
-    padding: 20px 4%;
+    padding: calc(env(safe-area-inset-top) + 20px) calc(env(safe-area-inset-right) + 4%) 20px calc(env(safe-area-inset-left) + 4%);
     display: flex;
     align-items: center;
     gap: 20px;
@@ -701,7 +701,7 @@ body.hide-navs .nf-nav, body.hide-navs .nf-bottom-nav {
 .nf-player-controls {
     position: absolute;
     bottom: 0; left: 0; width: 100%;
-    padding: 0 4% 20px;
+    padding: 0 calc(env(safe-area-inset-right) + 4%) calc(env(safe-area-inset-bottom) + 20px) calc(env(safe-area-inset-left) + 4%);
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
     z-index: 10;
     opacity: 0;
@@ -3214,8 +3214,7 @@ body.game-playing .nf-bottom-nav {
 .nf-quality-menu {
     display: none;
     position: absolute;
-    bottom: 50px;
-    right: 0;
+    bottom: calc(env(safe-area-inset-bottom) + 80px); right: calc(env(safe-area-inset-right) + 20px);
     background: rgba(28, 28, 28, 0.95);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px;
@@ -3255,3 +3254,5 @@ body.game-playing .nf-bottom-nav {
     color: #e50914;
     font-weight: bold;
 }
+
+
