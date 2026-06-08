@@ -12,7 +12,7 @@
     <title>TotoMelodies | Kids Entertainment</title>
     <link rel="manifest" href="manifest.json?v=17">
     <meta name="description" content="TotoMelodies - Watch, Learn and Play. The best kids entertainment platform.">
-    <link rel="stylesheet" href="css/style_v2.css?v=999">
+    <link rel="stylesheet" href="css/style_v2.css?v=1002">
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -311,16 +311,7 @@
 </div>
 
 <!-- ===================== PAGE: SEARCH RESULTS ===================== -->
-<div class="nf-page" id="page-search" style="display:none;">
-    <div class="inner-page">
-        <div style="display: flex; align-items: center; background: #2a2a2a; border-radius: 8px; padding: 10px 15px; margin-bottom: 20px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" style="margin-right: 10px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="search-input-page" placeholder="Titles, people, genres" oninput="handleSearch(this.value)" style="background: transparent; border: none; outline: none; color: white; width: 100%; font-size: 1.1rem;">
-        </div>
-        <h2 class="page-title">Top Searches</h2>
-        <div class="search-results-grid" id="search-results-grid"></div>
-    </div>
-</div>
+
 
 <!-- ===================== VIDEO PLAYER OVERLAY ===================== -->
 <div class="nf-player-overlay" id="video-player-overlay">
@@ -364,16 +355,6 @@
                 <button class="nf-ctrl-btn hide-on-mobile" onclick="toggleMute()" id="volume-btn">
                     <svg id="vol-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                 </button>
-                <button class="nf-ctrl-btn" onclick="toggleQualityMenu()">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                </button>
-                <div class="nf-quality-menu" id="quality-menu">
-                    <div class="nf-quality-header">Quality</div>
-                    <div class="nf-quality-option active" onclick="selectQuality('Auto')">Auto</div>
-                    <div class="nf-quality-option" onclick="selectQuality('1080p')">1080p HD</div>
-                    <div class="nf-quality-option" onclick="selectQuality('720p')">720p</div>
-                    <div class="nf-quality-option" onclick="selectQuality('480p')">480p Data Saver</div>
-                </div>
                 <button class="nf-ctrl-btn" onclick="toggleFullscreen()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                 </button>
@@ -566,7 +547,7 @@
 
 
             <!-- View: Profile Settings -->
-    <div class="nf-page" id="page-profile-settings" style="display:none; padding-top: calc(68px + env(safe-area-inset-top) + 20px); max-width: 600px; margin: 0 auto; color: #fff; text-align: center;">
+    <div class="nf-page" id="page-profile-settings" style="display:none; padding-top: max(env(safe-area-inset-top, 45px), 45px); max-width: 600px; margin: 0 auto; color: #fff; text-align: center;">
         <h1 style="font-size: 2.5rem; margin-bottom: 30px;">Profile Settings</h1>
         
         <div style="background: #181818; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
@@ -590,7 +571,7 @@
     </div>
 
     <!-- View: Admin Dashboard -->
-    <div class="nf-page" id="page-admin-dashboard" style="display:none; padding-top: calc(68px + env(safe-area-inset-top) + 20px); max-width: 900px; margin: 0 auto; color: #fff; padding-bottom: 50px;">
+    <div class="nf-page" id="page-admin-dashboard" style="display:none; padding-top: max(env(safe-area-inset-top, 45px), 45px); max-width: 900px; margin: 0 auto; color: #fff; padding-bottom: 50px;">
         <div class="admin-header">
             <h1>Admin Dashboard</h1>
             <p>Manage content and activation codes</p>
@@ -672,10 +653,7 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M9 22V12h6v10"></path></svg>
             <span>Home</span>
         </button>
-        <button class="nf-bottom-link" data-page="search" id="bnav-search" onclick="showPage('search')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
-            <span>Explore</span>
-        </button>
+        
         <button class="nf-bottom-link" data-page="games" id="bnav-games" onclick="showPage('games')">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><path d="M15 13h.01"></path><path d="M18 11h.01"></path></svg>
             <span>Games</span>
@@ -693,9 +671,15 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="js/supabase.js"></script>
     <script src="js/songs.js"></script>
-    <script src="js/app.js?v=17"></script>
+    <script src="js/app.js?v=300"></script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 

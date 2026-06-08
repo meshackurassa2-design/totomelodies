@@ -306,22 +306,25 @@ function filterCategory(btn, cat) {
 // Search logic updated for Netflix-style dedicated search page
 function renderTopSearches() {
     const grid = document.getElementById('search-results-grid');
-    let html = '';
-    // Show first 10 videos as "Top Searches"
+    if (!grid) return;
+    
+    // For demo, just show first 10
     const topSearches = videosList.slice(0, 10);
+    
+    let html = '';
     topSearches.forEach(v => {
         const enc = encodeURIComponent(JSON.stringify(v));
-        html += '<div class="nf-top-search-item" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
-        html += '<div class="nf-top-search-img-wrap"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
-        html += '<div class="nf-top-search-title">' + (v.title||'') + '</div>';
-        html += '<div class="nf-top-search-play"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="white"></polygon></svg></div>';
+        html += '<div class="nf-search-card" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
+        html += '<div class="nf-search-img"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
+        html += '<div class="nf-search-title">' + (v.title||'') + '</div>';
         html += '</div>';
     });
     grid.innerHTML = html;
 }
 
 function clearSearch() {
-    document.getElementById('search-input-page').value = '';
+    const input = document.getElementById('search-input-page');
+    if (input) input.value = '';
     renderTopSearches();
 }
 
@@ -338,11 +341,9 @@ function handleSearch(query) {
     let html = '';
     results.forEach(v => {
         const enc = encodeURIComponent(JSON.stringify(v));
-        // Use the same vertical list UI for search results as Netflix does
-        html += '<div class="nf-top-search-item" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
-        html += '<div class="nf-top-search-img-wrap"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
-        html += '<div class="nf-top-search-title">' + (v.title||'') + '</div>';
-        html += '<div class="nf-top-search-play"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="white"></polygon></svg></div>';
+        html += '<div class="nf-search-card" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
+        html += '<div class="nf-search-img"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
+        html += '<div class="nf-search-title">' + (v.title||'') + '</div>';
         html += '</div>';
     });
     
@@ -1588,6 +1589,52 @@ showPage = function(pageId) {
 
 
 
+
+// ===== SEARCH FUNCTIONALITY =====
+function renderTopSearches() {
+    const grid = document.getElementById('search-results-grid');
+    if (!grid) return;
+    const topSearches = videosList.slice(0, 10);
+    let html = '';
+    topSearches.forEach(v => {
+        const enc = encodeURIComponent(JSON.stringify(v));
+        html += '<div class="nf-search-card" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
+        html += '<div class="nf-search-img"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
+        html += '<div class="nf-search-title">' + (v.title||'') + '</div>';
+        html += '</div>';
+    });
+    grid.innerHTML = html;
+}
+
+function clearSearch() {
+    const input = document.getElementById('search-input-page');
+    if (input) input.value = '';
+    renderTopSearches();
+}
+
+function handleSearch(query) {
+    if (!query.trim()) {
+        renderTopSearches();
+        return;
+    }
+    const results = videosList.filter(v =>
+        ((v.title || '').toLowerCase().includes(query.toLowerCase()) || (v.category || '').toLowerCase().includes(query.toLowerCase()))
+    );
+    const grid = document.getElementById('search-results-grid');
+    let html = '';
+    results.forEach(v => {
+        const enc = encodeURIComponent(JSON.stringify(v));
+        html += '<div class="nf-search-card" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
+        html += '<div class="nf-search-img"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
+        html += '<div class="nf-search-title">' + (v.title||'') + '</div>';
+        html += '</div>';
+    });
+    if (results.length === 0) {
+        grid.innerHTML = '<div style="color:#666; text-align:center; padding: 40px 20px;">No results found for "' + query + '"</div>';
+    } else {
+        grid.innerHTML = html;
+    }
+}
 window.toggleQualityMenu = function() {
     const menu = document.getElementById("quality-menu");
     if (menu) {
@@ -1636,5 +1683,10 @@ window.selectQuality = function(quality) {
         };
     }
 };
+
+
+
+
+
 
 
