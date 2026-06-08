@@ -1,4 +1,4 @@
-/* ===================== TOTOMELODIES ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â FULL APP.JS ===================== */
+/* ===================== TOTOMELODIES - FULL APP.JS ===================== */
 
 // ===== MOCKUP DATA =====
 const dummyVideos = [];
@@ -12,10 +12,10 @@ const categoryIcons = {
 const animalData = {
     lion:     { name:'Lion',       fact:'Lions are the kings of the jungle! They have a loud roar that can be heard from 5 miles away. They love to sleep in the shade for up to 20 hours a day.', img:'assets/lion_mascot_1779138323522.png' },
     elephant: { name:'Elephant',   fact:'Elephants are the largest animals on land. They use their long trunks to drink water, pick up food, and even give themselves a shower!', img:'assets/transparent_elephant_1780219301774.png' },
-    giraffe:  { name:'Giraffe',    fact:'Giraffes have incredibly long necksÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âthey can easily reach the tastiest leaves at the very top of tall trees!', img:'assets/giraffe_mascot_1780220554293.png' },
+    giraffe:  { name:'Giraffe',    fact:'Giraffes have incredibly long necks - they can easily reach the tastiest leaves at the very top of tall trees!', img:'assets/giraffe_mascot_1780220554293.png' },
     monkey:   { name:'Monkey',     fact:'Monkeys are super smart and love to play! They swing from tree to tree using their strong arms and long tails, and their favorite snack is a yellow banana.', img:'assets/monkey_mascot_1780220566411.png' },
-    rhino:    { name:'Rhino',      fact:'Rhinos have large horns and very thick skinÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âthey are incredibly strong and powerful animals!', img:'assets/rhino_mascot_1780220579634.png' },
-    zebra:    { name:'Zebra',      fact:'Zebras have unique black and white stripesÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âno two zebras have the same pattern, just like human fingerprints!', img:'assets/zebra_mascot_1780220592191.png' },
+    rhino:    { name:'Rhino',      fact:'Rhinos have large horns and very thick skin - they are incredibly strong and powerful animals!', img:'assets/rhino_mascot_1780220579634.png' },
+    zebra:    { name:'Zebra',      fact:'Zebras have unique black and white stripes - no two zebras have the same pattern, just like human fingerprints!', img:'assets/zebra_mascot_1780220592191.png' },
 };
 
 // ===== STATE =====
@@ -233,14 +233,25 @@ function showPage(page) {
     const el = document.getElementById('page-' + page);
     if (el) el.style.display = 'block';
 
-    const nav = document.getElementById('main-nav');
-    const bottomNav = document.querySelector('.nf-bottom-nav');
+    const mainNav = document.getElementById('main-nav');
 
-    document.querySelectorAll('.nf-nav-link, .nf-mobile-link, .nf-bottom-link').forEach(l => {
-        l.classList.toggle('active', l.dataset.page === page);
-    });
-    if (page === 'profiles' || page === 'activation') {
+    // Update bottom nav active state
+    document.querySelectorAll('.nf-bottom-link').forEach(l => l.classList.remove('active'));
+    const pageToNavId = { home: 'bnav-home', search: 'bnav-search', games: 'bnav-games', 'profile-settings': 'bnav-profile' };
+    const activeBtn = document.getElementById(pageToNavId[page]);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Show/hide greeting header
+    const pagesWithHeader = ['home', 'games', 'search', 'profile-settings', 'admin-dashboard'];
+    if (mainNav) mainNav.style.display = pagesWithHeader.includes(page) ? '' : 'none';
+
+    if (page === 'profiles' || page === 'activation' || page === 'onboarding') {
         document.body.classList.add('hide-navs');
+        // Also directly hide the greeting header on these pages
+        const mainNav = document.getElementById('main-nav');
+        if (mainNav) mainNav.style.display = 'none';
+        const bottomNav = document.getElementById('bottom-nav');
+        if (bottomNav) bottomNav.style.display = 'none';
     } else {
         document.body.classList.remove('hide-navs');
     }
@@ -250,6 +261,7 @@ function showPage(page) {
     window.scrollTo(0, 0);
     closeMobileMenu();
 }
+
 function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
 function closeMobileMenu() { document.getElementById('mobile-menu')?.classList.remove('open'); }
 function toggleAvatarMenu() { document.getElementById('avatar-menu').classList.toggle('open'); }
@@ -274,33 +286,71 @@ function applyProfile(profile) {
     if (img && avatarMap[profile.avatar]) img.src = avatarMap[profile.avatar];
     const bi = document.getElementById('bottom-nav-avatar-img');
     if (bi && avatarMap[profile.avatar]) bi.src = avatarMap[profile.avatar];
+    // Update greeting header name
+    const nameEl = document.getElementById('tm-display-name');
+    if (nameEl && profile.name) nameEl.textContent = profile.name;
 }
-function toggleSearch() {
-    const bar = document.getElementById('search-bar');
-    bar.classList.add('open');
-    setTimeout(() => document.getElementById('search-input').focus(), 300);
+
+// Category filter tabs on home page
+function filterCategory(btn, cat) {
+    document.querySelectorAll('.tm-cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (cat === 'games') { showPage('games'); }
+    else {
+        // All / Videos: just show/filter video rows
+        const rows = document.querySelectorAll('.nf-row');
+        rows.forEach(r => r.style.display = '');
+    }
 }
-function closeSearch() {
-    document.getElementById('search-bar').classList.remove('open');
-    document.getElementById('search-input').value = '';
-    document.getElementById('search-results-grid').innerHTML = '';
+
+// Search logic updated for Netflix-style dedicated search page
+function renderTopSearches() {
+    const grid = document.getElementById('search-results-grid');
+    let html = '';
+    // Show first 10 videos as "Top Searches"
+    const topSearches = videosList.slice(0, 10);
+    topSearches.forEach(v => {
+        const enc = encodeURIComponent(JSON.stringify(v));
+        html += '<div class="nf-top-search-item" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
+        html += '<div class="nf-top-search-img-wrap"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
+        html += '<div class="nf-top-search-title">' + (v.title||'') + '</div>';
+        html += '<div class="nf-top-search-play"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="white"></polygon></svg></div>';
+        html += '</div>';
+    });
+    grid.innerHTML = html;
 }
+
+function clearSearch() {
+    document.getElementById('search-input-page').value = '';
+    renderTopSearches();
+}
+
 function handleSearch(query) {
-    if (!query.trim()) return;
+    if (!query.trim()) {
+        renderTopSearches();
+        return;
+    }
     const results = videosList.filter(v =>
-        v.title.toLowerCase().includes(query.toLowerCase()) ||
-        v.category.toLowerCase().includes(query.toLowerCase())
+        ((v.title || '').toLowerCase().includes(query.toLowerCase()) || (v.category || '').toLowerCase().includes(query.toLowerCase()))
     );
-    showPage('search');
+    
     const grid = document.getElementById('search-results-grid');
     let html = '';
     results.forEach(v => {
         const enc = encodeURIComponent(JSON.stringify(v));
-        html += '<div class="search-result-card" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
-        html += '<img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy">';
-        html += '<div class="search-result-title">' + (v.title||'') + '</div></div>';
+        // Use the same vertical list UI for search results as Netflix does
+        html += '<div class="nf-top-search-item" onclick="openDetailModal(JSON.parse(decodeURIComponent(\'' + enc + '\')))">';
+        html += '<div class="nf-top-search-img-wrap"><img src="' + (v.thumbnail_url||'') + '" alt="' + (v.title||'') + '" loading="lazy"></div>';
+        html += '<div class="nf-top-search-title">' + (v.title||'') + '</div>';
+        html += '<div class="nf-top-search-play"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="white"></polygon></svg></div>';
+        html += '</div>';
     });
-    grid.innerHTML = html;
+    
+    if (results.length === 0) {
+        grid.innerHTML = '<div style="color:#666; text-align:center; padding: 40px 20px;">No results found for "' + query + '"</div>';
+    } else {
+        grid.innerHTML = html;
+    }
 }
 
 // ===== VIDEO PLAYER =====
@@ -462,7 +512,7 @@ function startBalloonGame() {
     gameScore = 0;
     gameLives = 3;
     document.getElementById('score-display').textContent = '0';
-    document.getElementById('lives-display').textContent = 'ÃƒÂ¢Ã‚ÂÃ‚Â¤ÃƒÂ¯Ã‚Â¸Ã‚ÂÃƒÂ¢Ã‚ÂÃ‚Â¤ÃƒÂ¯Ã‚Â¸Ã‚ÂÃƒÂ¢Ã‚ÂÃ‚Â¤ÃƒÂ¯Ã‚Â¸Ã‚Â';
+    document.getElementById('lives-display').textContent = 'ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â¤ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â¤ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â¤ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â';
     document.getElementById('balloon-game-over').style.display = 'none';
     const playground = document.getElementById('balloon-playground');
     playground.innerHTML = '';
@@ -509,9 +559,9 @@ function spawnBalloon() {
         { base: '#FF6B35', light: '#FFAB87' },
     ];
     const picked = colors[Math.floor(Math.random() * colors.length)];
-    const size = Math.floor(Math.random() * 40) + 60; // 60ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“100px wide
+    const size = Math.floor(Math.random() * 40) + 60; // 60ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ100px wide
     const left = Math.floor(Math.random() * 83);
-    const dur  = Math.floor(Math.random() * 4) + 5; // 5ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“9s
+    const dur  = Math.floor(Math.random() * 4) + 5; // 5ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ9s
     const wobble = Math.random() > 0.5 ? 'animation: floatUp linear, wobble 1.5s ease-in-out infinite alternate;' : '';
 
     // Build realistic balloon structure
@@ -550,7 +600,7 @@ function loseBalloonLife() {
     if (gameLives <= 0) return;
     gameLives--;
     let hearts = '';
-    for(let i = 0; i < gameLives; i++) hearts += 'ÃƒÂ¢Ã‚ÂÃ‚Â¤ÃƒÂ¯Ã‚Â¸Ã‚Â';
+    for(let i = 0; i < gameLives; i++) hearts += 'ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â¤ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â';
     document.getElementById('lives-display').textContent = hearts;
     
     if (gameLives === 0) {
@@ -1111,7 +1161,7 @@ window.showPage = function(pageId) {
         }
         loadAdminDashboard();
     }
-    _internalShowPage(pageId); // call original ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no recursion
+    _internalShowPage(pageId); // call original ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â no recursion
     if (pageId !== 'profiles') {
         const pScreen = document.getElementById('profiles-create-view');
         if (pScreen) pScreen.style.display = 'none';
@@ -1224,6 +1274,7 @@ window.openVideoPlayer = function(url, title, videoId) {
     videoEl.src = url;
     
     overlay.style.display = 'flex';
+    document.body.classList.add('video-playing'); // Force hide navs
     videoEl.play();
     
     // Setup interval for progress bar and time
@@ -1532,435 +1583,58 @@ showPage = function(pageId) {
 
 // ===================== STORY BOOKS FEATURE =====================
 // ===================== STORY BOOKS FEATURE =====================
-const storyBooks = [
-    {
-        id: 'lion-brave',
-        title: 'The Brave Little Lion',
-        coverEmoji: 'ÃƒÂ°Ã…Â¸Ã‚Â¦Ã‚Â',
-        coverBg: "url('assets/lion_cover.png') center/cover",
-        spineColor: '#FF6B6B',
-        pages: [
-            { img: 'assets/lion_cover.png', bg: '#FFF9C4', text: 'Once upon a time, deep in the sunny savannah, there lived a little lion named Simba.' },
-            { img: 'assets/serengeti.png', bg: '#FFE0B2', text: 'All the grown-up lions had HUGE roars that shook the ground and could be heard for miles!' },
-            { img: 'assets/lion_page_3.png', bg: '#E1F5FE', text: 'But when little Simba tried to roarÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ all that came out was a tiny little "squeak." The animals giggled.' },
-            { img: 'assets/transparent_lion.png', bg: '#FFF8E1', text: 'Simba was determined to find his big roar. He marched bravely out into the wide grassy plains.' },
-            { img: 'assets/giraffe.png', bg: '#F1F8E9', text: 'He met a very tall giraffe. "Can you teach me to roar?" Simba squeaked hopefully.' },
-            { img: 'assets/kilimanjaro.png', bg: '#E8EAF6', text: 'The giraffe just munched on leaves. "I don\'t roar, little one. I just reach high into the trees!"' },
-            { img: 'assets/rhino.png', bg: '#EFEBE9', text: 'Next, he saw a tough rhino in the mud. "Can you teach me to roar?" Simba asked.' },
-            { img: 'assets/zebra.png', bg: '#FFF3E0', text: 'The rhino snorted. "I don\'t roar, I charge!" Even the galloping zebras didn\'t know how to roar.' },
-            { img: 'assets/simba.png', bg: '#FFEBEE', text: 'Suddenly, a mean hyena jumped out of the bushes! Simba had to be brave! He took a huge breath...' },
-            { img: 'assets/lion_page_4.png', bg: '#E8F5E9', text: '"ROARRRR!!!" The biggest, loudest roar ever! The hyena ran away so fast it tripped over its paws! ÃƒÂ°Ã…Â¸Ã‚Â¦Ã‚Â The End ÃƒÂ¢Ã‚Â­Ã‚Â' }
-        ]
-    },
-    {
-        id: 'elephant-forgets',
-        title: 'The Elephant Who Forgot',
-        coverEmoji: 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‹Å“',
-        coverBg: "url('assets/elephant_cover.png') center/cover",
-        spineColor: '#4ECDC4',
-        pages: [
-            { img: 'assets/tembo_page_one_1780338501887.png', bg: '#E0F7FA', text: 'Tembo was the wisest elephant in the jungle. Everyone always said, "An elephant NEVER forgets!"' },
-            { img: 'assets/tembo_page_two_1780338516887.png', bg: '#FFFDE7', text: 'But one sunny morning, Tembo woke up and his head felt suspiciously chilly.' },
-            { img: 'assets/tembo_page_three_1780338532646.png', bg: '#E3F2FD', text: '"My favorite red hat!" cried Tembo. "It\'s gone!" He started his search at the sparkling river.' },
-            { img: 'assets/kilimanjaro.png', bg: '#E8F5E9', text: 'He checked under the giant baobab tree, but only found some sleepy bats.' },
-            { img: 'assets/giraffe.png', bg: '#FFF8E1', text: '"Have you seen my hat?" he asked the tall giraffes munching on leaves. They shook their heads.' },
-            { img: 'assets/rhino.png', bg: '#F3E5F5', text: 'He asked the rhinos playing in the mud. "Nope, not here!" they snorted.' },
-            { img: 'assets/zebra.png', bg: '#FFEBEE', text: 'He even asked the zebras galloping by, but they hadn\'t seen it either.' },
-            { img: 'assets/transparent_elephant.png', bg: '#ECEFF1', text: 'Tembo felt sad. How could a wise elephant lose his favorite hat?' },
-            { img: 'assets/monkey.png', bg: '#E8F5E9', text: 'Just then, a cheeky little monkey swung down and pointed, giggling. "Tembo... what\'s that in your trunk?"' },
-            { img: 'assets/tembo.png', bg: '#E0F7FA', text: 'Tembo looked down. He had been holding his red hat in his trunk the entire time! All the animals laughed! ÃƒÂ°Ã…Â¸Ã‚ÂÃ‹Å“ The End ÃƒÂ¢Ã‚Â­Ã‚Â' }
-        ]
-    },
-    {
-        id: 'magic-mango',
-        title: 'The Magic Mango Tree',
-        coverEmoji: 'ÃƒÂ°Ã…Â¸Ã…â€™Ã‚Â³',
-        coverBg: "url('assets/mango_cover.png') center/cover",
-        spineColor: '#66BB6A',
-        pages: [
-            { img: 'assets/mango_cover.png', bg: '#F9FBE7', text: 'Deep in the jungle stood a magical Mango Tree. Its leaves shimmered gold, and its mangoes glowed like tiny suns.' },
-            { img: 'assets/serengeti.png', bg: '#FFFDE7', text: 'The legend said: whoever showed true KINDNESS to another would receive a golden mango that grants one wish.' },
-            { img: 'assets/zebra.png', bg: '#ECEFF1', text: 'A greedy zebra galloped up and kicked the trunk. "Give me a mango NOW!" he demanded rudely. Nothing happened.' },
-            { img: 'assets/rhino.png', bg: '#E3F2FD', text: 'A grumpy rhino bumped the tree with his horn. "I demand a mango!" But the tree stayed silent.' },
-            { img: 'assets/lion_cover.png', bg: '#F1F8E9', text: 'Even a proud lion roared at the tree, but the magic mangoes would not fall for selfishness.' },
-            { img: 'assets/monkey.png', bg: '#FFF9C4', text: 'Then, a little monkey swung by. He saw a tiny bird who had lost her nest in a terrible storm.' },
-            { img: 'assets/giraffe.png', bg: '#E8F5E9', text: 'The monkey felt sad for the little bird. He quickly climbed high up to gather soft leaves for a new nest.' },
-            { img: 'assets/kilimanjaro.png', bg: '#66BB6A', text: 'Without hesitating, the monkey shared his only banana with the hungry bird. It was true kindness.' },
-            { img: 'assets/mango_cover.png', bg: '#FFD54F', text: 'Suddenly, the tree rustled its golden leaves! A glowing mango fell gently right into the monkey\'s hands!' },
-            { img: 'assets/elephant_cover.png', bg: '#E0F7FA', text: 'The monkey wished for enough food for everyone in the jungle. POOF! The jungle was full of fruit! ÃƒÂ°Ã…Â¸Ã…â€™Ã‚Â³ The End ÃƒÂ¢Ã‚Â­Ã‚Â' }
-        ]
-    }
-];
 
-// ---- Shelf / Book Card View ----
-function buildStoriesGrid() {
-    const shelf = document.getElementById('stories-shelf');
-    if (!shelf) return;
+
+
+
+
+window.toggleQualityMenu = function() {
+    const menu = document.getElementById("quality-menu");
+    if (menu) {
+        menu.classList.toggle("show");
+    }
+};
+
+window.selectQuality = function(quality) {
+    const options = document.querySelectorAll(".nf-quality-option");
+    options.forEach(opt => opt.classList.remove("active"));
     
-    let html = `
-    <!-- Playroom Library Container -->
-    <div style="display: flex; flex-direction: column; gap: 60px; padding-top: 40px; align-items: center; position: relative; z-index: 2;">
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 60px 80px; width: 100%; max-width: 1000px;">
-    `;
+    // Find the clicked option and make it active
+    const clickedOpt = Array.from(options).find(opt => opt.textContent.includes(quality));
+    if (clickedOpt) {
+        clickedOpt.classList.add("active");
+    }
     
-    const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#9D4EDD', '#FF9F1C'];
+    // Hide the menu
+    const menu = document.getElementById("quality-menu");
+    if (menu) {
+        menu.classList.remove("show");
+    }
     
-    storyBooks.forEach((book, index) => {
-        const tilt = index % 2 === 0 ? '-3deg' : '3deg';
-        const color = colors[index % colors.length];
+    const videoEl = document.getElementById('main-video-player');
+    if (videoEl && !videoEl.paused) {
+        // Save current time
+        const currentTime = videoEl.currentTime;
+        const isPlaying = !videoEl.paused;
         
-        html += `
-            <div class="creative-book-item" style="position: relative; display: flex; flex-direction: column; align-items: center; width: 240px; margin-bottom: 20px;">
-                <!-- The Book -->
-                <div class="magic-book" onclick="openBook('${book.id}')" 
-                     style="background: ${book.coverBg}; border-radius: 12px 20px 20px 12px; width: 190px; height: 260px; 
-                            box-shadow: -10px 15px 30px rgba(0,0,0,0.15), inset 4px 0 10px rgba(255,255,255,0.4); 
-                            position: relative; z-index: 3; cursor: pointer; transform: rotate(${tilt}); 
-                            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-                            border-right: 5px solid #fff; border-top: 3px solid #fff; border-bottom: 3px solid #fff; border-left: 1px solid #fff;">
-                    
-                    <!-- Spine -->
-                    <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 22px; background: ${book.spineColor}; border-radius: 10px 0 0 10px; box-shadow: inset -4px 0 8px rgba(0,0,0,0.2);"></div>
-                    
-                    <!-- Title Badge -->
-                    <div style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 90%; background: #fff; padding: 10px 5px; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); text-align: center; border: 4px solid ${color};">
-                        <div style="font-size: 1.05rem; font-weight: 900; color: #333; line-height: 1.2;">${book.title}</div>
-                    </div>
-                </div>
-                
-                <!-- Magical Floating Shelf (Pill shaped) -->
-                <div style="width: 260px; height: 28px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 30px; box-shadow: 0 15px 25px rgba(0,0,0,0.08), inset 0 3px 6px rgba(255,255,255,1); position: relative; z-index: 1; margin-top: 10px;">
-                     <!-- Shelf Lip Highlight -->
-                     <div style="position: absolute; top: 2px; left: 10%; right: 10%; height: 6px; background: rgba(255,255,255,0.9); border-radius: 10px;"></div>
-                </div>
-                
-                <!-- Page Count Badge -->
-                <div style="margin-top: 25px; background: ${color}; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 2; border: 2px solid #fff;">
-                    ${book.pages.length} Pages
-                </div>
-            </div>
-        `;
-    });
-    
-    html += `
-        </div>
-    </div>
-    
-    <!-- CSS for hover animations and magic sparkles -->
-    <style>
-        .creative-book-item .magic-book:hover {
-            transform: translateY(-20px) rotate(0deg) scale(1.08) !important;
-            box-shadow: -15px 25px 40px rgba(0,0,0,0.2), inset 4px 0 10px rgba(255,255,255,0.6) !important;
-        }
+        // Show loading spinner
+        const spinner = document.getElementById('video-loading-spinner');
+        if(spinner) spinner.style.display = 'block';
         
-        /* Floating sparkles background effect */
-        .sparkle-bg {
-            position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
-        }
-        .sparkle {
-            position: absolute; background: #fff; border-radius: 50%; opacity: 0.6;
-            animation: float-up linear infinite;
-        }
-        @keyframes float-up {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
-        }
-    </style>
-    
-    <!-- Background Sparkles -->
-    <div class="sparkle-bg">
-        <div class="sparkle" style="width: 12px; height: 12px; left: 15%; animation-duration: 8s; animation-delay: 1s;"></div>
-        <div class="sparkle" style="width: 18px; height: 18px; left: 35%; animation-duration: 12s; animation-delay: 3s;"></div>
-        <div class="sparkle" style="width: 10px; height: 10px; left: 55%; animation-duration: 7s; animation-delay: 0s;"></div>
-        <div class="sparkle" style="width: 25px; height: 25px; left: 75%; animation-duration: 10s; animation-delay: 2s;"></div>
-        <div class="sparkle" style="width: 15px; height: 15px; left: 85%; animation-duration: 9s; animation-delay: 4s;"></div>
-    </div>
-    `;
-    
-    shelf.innerHTML = html;
-}
-
-// ---- Book Reader ----
-let currentBook = null;
-let currentPageIndex = 0;
-
-window.openBook = function(id) {
-    currentBook = storyBooks.find(b => b.id === id);
-    if (!currentBook) return;
-    currentPageIndex = 0;
-    window.speechSynthesis && window.speechSynthesis.cancel();
-
-    document.getElementById('book-reader-title-bar').textContent = currentBook.title;
-    const overlay = document.getElementById('book-reader-overlay');
-    overlay.style.display = 'flex';
-    renderBookPage(true);
-};
-
-window.closeBook = function() {
-    document.getElementById('book-reader-overlay').style.display = 'none';
-    window.speechSynthesis && window.speechSynthesis.cancel();
-};
-
-window.bookNextPage = function() {
-    if (!currentBook) return;
-    if (currentPageIndex < currentBook.pages.length - 1) {
-        currentPageIndex++;
-        renderBookPage(true);
-    }
-};
-
-window.bookPrevPage = function() {
-    if (!currentBook || currentPageIndex === 0) return;
-    currentPageIndex--;
-    renderBookPage(false);
-};
-
-window.readCurrentPageAloud = function() {
-    if (!currentBook) return;
-    const page = currentBook.pages[currentPageIndex];
-    if (!page) return;
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(page.text);
-        u.lang = 'en-US';
-        u.rate = 0.8;
-        u.pitch = 1.3;
-        window.speechSynthesis.speak(u);
-    }
-};
-
-function renderBookPage(forward = true) {
-    if (!currentBook) return;
-    const page = currentBook.pages[currentPageIndex];
-    const total = currentBook.pages.length;
-    const container = document.getElementById('book-container');
-    const indicator = document.getElementById('book-page-indicator');
-    const prevBtn = document.getElementById('book-prev-btn');
-    const nextBtn = document.getElementById('book-next-btn');
-
-    // Update page indicator
-    indicator.textContent = `Page ${currentPageIndex + 1} of ${total}`;
-    prevBtn.style.opacity = currentPageIndex === 0 ? '0.3' : '1';
-    prevBtn.style.pointerEvents = currentPageIndex === 0 ? 'none' : 'auto';
-
-    if (currentPageIndex === total - 1) {
-        nextBtn.textContent = 'ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° Finish';
-        nextBtn.onclick = closeBook;
-    } else {
-        nextBtn.textContent = 'Next ÃƒÂ¢Ã¢â‚¬â€œÃ‚Â¶';
-        nextBtn.onclick = bookNextPage;
-    }
-
-    // Animate page flip
-    let leftAnim = forward ? '' : 'animation: leftPageTurn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: right center;';
-    let rightAnim = forward ? 'animation: rightPageTurn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: left center;' : '';
-
-    if (currentPageIndex === 0) {
-        // Book Opening Animation
-        leftAnim = 'animation: leftPageTurn 1s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: right center;';
-        rightAnim = 'animation: rightPageTurn 1s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: left center;';
-    }
-    
-    let imgHTML = '';
-    if (page.img) {
-        imgHTML = `
-            <div class="book-img-page" style="flex:1; background: ${page.bg || '#fffdf5'}; border-radius: 12px 0 0 12px; display: flex; align-items: center; justify-content: center; padding: 25px; box-shadow: inset -10px 0 20px rgba(0,0,0,0.1); min-height: 250px; overflow: hidden; position: relative; ${leftAnim}">
-                <!-- Decorative background elements using pure CSS/HTML pattern to make it feel premium -->
-                <div style="position: absolute; inset: 0; opacity: 0.05; background-image: radial-gradient(circle at 20% 30%, #000 1px, transparent 1px), radial-gradient(circle at 75% 60%, #000 1px, transparent 1px); background-size: 20px 20px;"></div>
-                <img src="${page.img}" alt="Page illustration" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 12px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12)); border: 6px solid #fff; transform: rotate(-1deg); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onmouseover="this.style.transform='scale(1.05) rotate(1deg)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.18)';" onmouseout="this.style.transform='scale(1) rotate(-1deg)'; this.style.boxShadow='none';">
-            </div>
-        `;
-    } else {
-        imgHTML = `<div class="book-img-page" style="flex:1; background: ${page.bg}; border-radius: 12px 0 0 12px; display:flex; align-items:center; justify-content:center; font-size:100px; box-shadow: inset -10px 0 20px rgba(0,0,0,0.1); min-height: 250px; ${leftAnim}">${page.emoji}</div>`;
-    }
-
-    container.innerHTML = `
-        <div class="book-hardcover" style="background: #2a3b5c; padding: 10px; border-radius: 15px; box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.8); position: relative; max-width: 950px; margin: 0 auto; display: flex; perspective: 3000px;">
-            
-            <!-- Book Spine Binding Details on Hardcover -->
-            <div style="position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.1) 20%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0.4)); z-index: 0;"></div>
-            
-            <div class="book-spread" style="display: flex; width: 100%; position: relative; z-index: 1; transform-style: preserve-3d;">
-                <!-- Left Page (Image) -->
-                ${imgHTML}
-
-                <!-- Center Fold (Spine shadow inside pages) -->
-                <div class="book-spine-fold" style="position: absolute; left: 50%; top: 0; bottom: 0; width: 40px; transform: translateX(-50%); background: linear-gradient(to right, transparent, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.15) 55%, transparent); pointer-events: none; z-index: 10;"></div>
-
-                <!-- Right Page (Text) -->
-                <div class="book-text-page" style="flex:1; background: #fffdf5; border-radius: 0 10px 10px 0; padding: 40px; display: flex; flex-direction: column; justify-content: center; box-shadow: inset 10px 0 20px rgba(0,0,0,0.05); position: relative; ${rightAnim}">
-                    <div style="position: absolute; bottom: 15px; right: 20px; font-size: 1rem; color: #888; font-weight: 700;">${currentPageIndex + 1}</div>
-                    <p class="book-text-content" style="font-size: 1.8rem; line-height: 1.6; color: #333; font-weight: 600; text-align: left;">${page.text}</p>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Auto read new page
-    window.speechSynthesis && window.speechSynthesis.cancel();
-}
-
-// Add CSS for page animations
-if (!document.getElementById('book-anim-style')) {
-    const style = document.createElement('style');
-    style.id = 'book-anim-style';
-    style.textContent = `
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
-
-        @keyframes rightPageTurn {
-            0% { transform: perspective(2500px) rotateY(-90deg); filter: brightness(0.5); }
-            100% { transform: perspective(2500px) rotateY(0deg); filter: brightness(1); }
-        }
-        @keyframes leftPageTurn {
-            0% { transform: perspective(2500px) rotateY(90deg); filter: brightness(0.5); }
-            100% { transform: perspective(2500px) rotateY(0deg); filter: brightness(1); }
-        }
+        // In a real app with multiple streams, you would change the URL here based on 'quality'
+        // Example: let newUrl = originalUrl.replace('.mp4', `_${quality}.mp4`);
+        // For this demo, we simulate the stream switch by reloading the current source
+        const currentSrc = videoEl.src;
+        videoEl.src = currentSrc; 
         
-        .book-spread {
-            display: flex;
-            width: 100%;
-            height: 480px;
-            perspective: 2500px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border-radius: 12px;
-            background: #fff;
-            position: relative;
-            transform-style: preserve-3d;
-        }
-
-        .book-spine-fold {
-            width: 3px; 
-            background: linear-gradient(90deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.2) 50%, rgba(0,0,0,0.3) 100%); 
-            z-index: 5;
-        }
-
-        .book-text-page {
-            flex:1; 
-            background: #fffdf5; 
-            border-radius: 0 12px 12px 0; 
-            padding: 40px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            box-shadow: inset 15px 0 25px rgba(0,0,0,0.06);
-        }
-
-        .book-text-content {
-            font-size: clamp(1.4rem, 2.5vw, 1.8rem); 
-            font-weight: 700; 
-            color: #333; 
-            line-height: 1.6; 
-            text-align: center; 
-            font-family: 'Fredoka One', 'Inter', sans-serif;
-        }
-
-        /* Responsive Layout for Mobile */
-        @media (max-width: 768px) {
-            .book-spread {
-                flex-direction: column;
-                height: auto;
-                min-height: 60vh;
-                border-radius: 12px;
-                overflow: hidden;
+        videoEl.onloadedmetadata = () => {
+            videoEl.currentTime = currentTime;
+            if (isPlaying) {
+                videoEl.play().catch(e => console.log("Play interrupted"));
             }
-            .book-img-page {
-                border-radius: 12px 12px 0 0 !important;
-                min-height: 250px;
-            }
-            .book-spine-fold {
-                width: 100%;
-                height: 3px;
-                background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.2) 50%, rgba(0,0,0,0.3) 100%);
-            }
-            .book-text-page {
-                border-radius: 0 0 12px 12px;
-                padding: 30px 20px;
-                min-height: 250px;
-            }
-        }
-
-        /* Magical Floating Shelves Styling */
-        .magic-shelves-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 50px 30px;
-            justify-content: center;
-        }
-
-        .magic-shelf-item {
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: relative;
-            width: 250px;
-            padding-bottom: 25px; 
-            z-index: 2;
-        }
-        
-        /* The magical glowing shelf plank */
-        .magic-shelf-item::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 20px;
-            background: linear-gradient(180deg, rgba(160, 95, 53, 0.95), rgba(90, 50, 25, 0.98));
-            border-top: 2px solid rgba(255, 215, 0, 0.4);
-            border-bottom: 6px solid rgba(30, 15, 5, 0.95);
-            border-radius: 4px;
-            box-shadow: 
-                0 15px 30px rgba(0,0,0,0.9),
-                0 0 30px rgba(255, 215, 0, 0.15);
-            z-index: 0;
-        }
-
-        /* Bracket underneath */
-        .magic-shelf-item::before {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 180px;
-            height: 15px;
-            background: linear-gradient(180deg, rgba(60, 30, 15, 0.8), transparent);
-            border-radius: 0 0 50% 50%;
-            z-index: -1;
-            filter: blur(2px);
-        }
-
-        .bookcase-book {
-            position: relative; 
-            width: 180px; 
-            height: 240px; 
-            border-radius: 4px 12px 12px 4px; 
-            box-shadow: -15px 15px 30px rgba(0,0,0,0.8), inset -4px 0 8px rgba(0,0,0,0.4); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 15px; 
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 2;
-        }
-        
-        .bookcase-book:hover {
-            transform: translateY(-20px) rotate(-3deg) scale(1.05);
-        }
-
-        /* Book shelf cards */
-        #stories-shelf { margin-bottom: 30px; }
-        #stories-shelf > div { user-select: none; }
-    `;
-    document.head.appendChild(style);
-}
-
-window.addEventListener('load', buildStoriesGrid);
-
+            if(spinner) spinner.style.display = 'none';
+        };
+    }
+};
 
 

@@ -29,20 +29,30 @@ async function initAuth() {
     // Check current session
     const { data: { session } } = await sb.auth.getSession();
     currentAuthUser = session?.user || null;
-    
-    // Hide the global splash screen now that we know the auth state
+
+    // Minimum splash display time: 3 seconds
+    const splashMinTime = new Promise(resolve => setTimeout(resolve, 3000));
+    await splashMinTime;
+
+    // Fade out and hide the global splash screen
     const splash = document.getElementById('global-splash');
-    if (splash) splash.style.display = 'none';
-    
-    // Hide the custom splash screen smoothly
+    if (splash) {
+        splash.style.transition = 'opacity 0.6s ease-out';
+        splash.style.opacity = '0';
+        setTimeout(() => { splash.style.display = 'none'; }, 650);
+    }
+
+    // Fade out the custom splash screen too
     const customSplash = document.getElementById('splash-screen');
     if (customSplash) {
+        customSplash.style.transition = 'opacity 0.6s ease-out';
         customSplash.style.opacity = '0';
-        setTimeout(() => { customSplash.style.display = 'none'; }, 500);
+        setTimeout(() => { customSplash.style.display = 'none'; }, 650);
     }
 
     if (!currentAuthUser) showAuthScreen();
 }
+
 
 async function checkAndRouteUser() {
     if (!currentAuthUser) return;

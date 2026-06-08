@@ -3,11 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- FORCE BROWSER TO CLEAR CACHE AND LOAD LATEST CHANGES -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>TotoMelodies | Kids Entertainment</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json?v=17">
     <meta name="description" content="TotoMelodies - Watch, Learn and Play. The best kids entertainment platform.">
-    <link rel="stylesheet" href="css/style.css?v=10">
-    <link rel="stylesheet" href="css/splash.css">
+    <link rel="stylesheet" href="css/style_v2.css?v=999">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                let uninstalled = false;
+                for(let registration of registrations) {
+                    registration.unregister();
+                    uninstalled = true;
+                }
+                if (uninstalled) {
+                    window.location.reload(true);
+                }
+            });
+        }
+    </script>
+    <link rel="stylesheet" href="css/splash.css?v=17">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
@@ -18,12 +38,45 @@
     </div>
 
 <!-- ===================== LOADING SPLASH (Prevents Flash) ===================== -->
-<div id="global-splash" style="position:fixed; inset:0; z-index:99999; background:var(--nf-black); display:flex; align-items:center; justify-content:center;">
-    <div style="color:#e50914; font-size:3rem; font-weight:900; letter-spacing:-1px; animation: pulse 1.5s infinite;">TOTOMELODIES</div>
+<div id="global-splash" style="position:fixed; inset:0; z-index:99999; background:#0d0d0d; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; overflow: hidden;">
+    <div style="
+        color:#e50914;
+        font-size: clamp(1.2rem, 7vw, 2.5rem);
+        font-weight:900;
+        letter-spacing: 0px;
+        font-family:'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        text-transform:uppercase;
+        text-shadow: 0 0 20px rgba(229,9,20,0.7), 0 0 40px rgba(229,9,20,0.4);
+        animation: splashPulse 1.5s ease-in-out infinite;
+        width: 100%;
+        max-width: 100vw;
+        text-align: center;
+        padding: 0 20px;
+        box-sizing: border-box;
+        white-space: nowrap;
+    ">TOTOMELODIES</div>
+    <div style="
+        display:flex; gap:6px; margin-top:12px;
+    ">
+        <span style="width:8px;height:8px;background:#e50914;border-radius:50%;animation:dot 1.2s 0s infinite;opacity:0.3;"></span>
+        <span style="width:8px;height:8px;background:#e50914;border-radius:50%;animation:dot 1.2s 0.2s infinite;opacity:0.3;"></span>
+        <span style="width:8px;height:8px;background:#e50914;border-radius:50%;animation:dot 1.2s 0.4s infinite;opacity:0.3;"></span>
+    </div>
 </div>
+
 <style>
+@keyframes splashPulse {
+    0%   { opacity: 0.7; transform: scale(0.97); }
+    50%  { opacity: 1;   transform: scale(1.03); text-shadow: 0 0 40px rgba(229,9,20,0.9), 0 0 80px rgba(229,9,20,0.5); }
+    100% { opacity: 0.7; transform: scale(0.97); }
+}
 @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.5; transform: scale(0.95); } }
+@keyframes dot {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.4); background: #ff1a1a; }
+}
 </style>
+
 
 <!-- ===================== AUTH SCREEN (Real Supabase Login) ===================== -->
 <div class="auth-screen hidden" id="auth-screen">
@@ -90,51 +143,10 @@
     </div>
 </div>
 
-<!-- ===================== NETFLIX-STYLE TOP NAV ===================== -->
-<nav class="nf-nav" id="main-nav">
-    <div class="nf-nav-left">
-        <div class="nf-logo" onclick="showPage('home')">TotoMelodies</div>
-        <ul class="nf-nav-links" id="nav-links">
-            <li class="nf-nav-link active" data-page="home" onclick="showPage('home')">Home</li>
-            <li class="nf-nav-link" data-page="games" onclick="showPage('games')">Michezo</li>
-
-
-            <li id="nav-admin-link" class="nf-nav-link" data-page="admin" onclick="showPage('admin-dashboard')" style="display:none; color:#e50914; font-weight:bold;">Admin</li>
-        </ul>
-    </div>
-    <div class="nf-nav-right">
-        <div class="nf-search-btn" onclick="toggleSearch()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        </div>
-        <div class="nf-avatar-wrap" id="nf-user-avatar">
-            <div class="nf-avatar" onclick="showPage('profile-settings'); populateProfileSettings()">
-                <img src="assets/lion_mascot_1779138323522.png" alt="Profile" id="nav-avatar-img">
-                <svg class="nf-avatar-caret" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
-            </div>
-            <div class="nf-avatar-menu" id="avatar-menu">
-                <div class="nf-avatar-menu-item" onclick="showPage('profiles'); closeAvatarMenu()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    Switch Profile
-                </div>
-                <div class="nf-avatar-menu-divider"></div>
-                <div class="nf-avatar-menu-item nf-avatar-menu-signout" onclick="handleSignOut()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    Sign Out
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
+<!-- Header removed as requested -->
     
 
-<!-- ===================== SEARCH BAR ===================== -->
-<div class="nf-search-bar" id="search-bar">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-    <input type="text" id="search-input" placeholder="Titles, people, genres" oninput="handleSearch(this.value)">
-    <button onclick="closeSearch()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-    </button>
-</div>
+<!-- Search Bar moved to dedicated page -->
 
 <!-- ===================== PAGE: WHO'S WATCHING (PROFILES) ===================== -->
 <div class="nf-page" id="page-profiles" style="display:none;">
@@ -217,7 +229,7 @@
 
 <!-- ===================== PAGE: HOME ===================== -->
 <div class="nf-page" id="page-home" style="display:none;">
-    <!-- Billboard Hero -->
+    <!-- Hero Carousel -->
     <div class="nf-billboard" id="billboard">
         <div class="billboard-bg">
             <img src="assets/lion_mascot_1779138323522.png" alt="Featured" id="billboard-img">
@@ -231,7 +243,7 @@
                 <span class="bb-year">2024</span>
                 <span class="bb-rating">G</span>
             </div>
-            <p class="billboard-synopsis" id="billboard-synopsis">The most exciting kids entertainment â€” songs, stories, cartoons and more!</p>
+            <p class="billboard-synopsis" id="billboard-synopsis">The most exciting kids entertainment — songs, stories, cartoons and more!</p>
             <div class="billboard-actions">
                 <button class="nf-btn nf-btn-play" id="billboard-play-btn">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -246,9 +258,13 @@
         <div class="billboard-dots-wrap">
             <div class="billboard-dots" id="billboard-dots"></div>
         </div>
-        <div class="billboard-maturity">
-            <span class="maturity-rating">G</span>
-        </div>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <div class="tm-category-tabs" id="tm-category-tabs">
+        <button class="tm-cat-btn active" data-cat="all" onclick="filterCategory(this, 'all')">All</button>
+        <button class="tm-cat-btn" data-cat="videos" onclick="filterCategory(this, 'videos')">Videos</button>
+        <button class="tm-cat-btn" data-cat="games" onclick="filterCategory(this, 'games')">Michezo</button>
     </div>
 
     <!-- Video Rows -->
@@ -297,7 +313,11 @@
 <!-- ===================== PAGE: SEARCH RESULTS ===================== -->
 <div class="nf-page" id="page-search" style="display:none;">
     <div class="inner-page">
-        <h2 class="page-title">Search Results</h2>
+        <div style="display: flex; align-items: center; background: #2a2a2a; border-radius: 8px; padding: 10px 15px; margin-bottom: 20px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" style="margin-right: 10px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="search-input-page" placeholder="Titles, people, genres" oninput="handleSearch(this.value)" style="background: transparent; border: none; outline: none; color: white; width: 100%; font-size: 1.1rem;">
+        </div>
+        <h2 class="page-title">Top Searches</h2>
         <div class="search-results-grid" id="search-results-grid"></div>
     </div>
 </div>
@@ -319,15 +339,21 @@
     </div>
 
     <div class="nf-center-controls">
-        <button class="nf-center-btn" onclick="skipBackward()">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="white"><path d="M12.5 3a9.5 9.5 0 1 0 9.5 9.5"/><path d="M15.5 1h-6l3-3z"/><text x="7" y="14" font-size="6" fill="white">10</text></svg>
+        <button class="nf-center-btn nf-skip-btn" onclick="skipBackward()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                <path d="M12.5 3a9.5 9.5 0 1 0 9.5 9.5"/><path d="M15.5 1h-6l3-3z"/>
+                <text x="8" y="15" font-size="7" font-weight="bold" fill="white" stroke="none">10</text>
+            </svg>
         </button>
         <button class="nf-center-btn nf-play-btn" id="play-pause-btn" onclick="togglePlayPause()">
-            <svg id="play-icon" width="64" height="64" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            <svg id="pause-icon" width="64" height="64" viewBox="0 0 24 24" fill="white" style="display:none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            <svg id="play-icon" width="36" height="36" viewBox="0 0 24 24" fill="white"><polygon points="6 4 20 12 6 20"></polygon></svg>
+            <svg id="pause-icon" width="36" height="36" viewBox="0 0 24 24" fill="white" style="display:none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
         </button>
-        <button class="nf-center-btn" onclick="skipForward()">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="white"><path d="M11.5 3a9.5 9.5 0 1 1-9.5 9.5"/><path d="M8.5 1h6l-3-3z"/><text x="9" y="14" font-size="6" fill="white">10</text></svg>
+        <button class="nf-center-btn nf-skip-btn" onclick="skipForward()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                <path d="M11.5 3a9.5 9.5 0 1 1-9.5 9.5"/><path d="M8.5 1h6l-3-3z"/>
+                <text x="8.5" y="15" font-size="7" font-weight="bold" fill="white" stroke="none">10</text>
+            </svg>
         </button>
     </div>
 
@@ -540,7 +566,7 @@
 
 
             <!-- View: Profile Settings -->
-    <div class="nf-page" id="page-profile-settings" style="display:none; padding-top: 100px; max-width: 600px; margin: 0 auto; color: #fff; text-align: center;">
+    <div class="nf-page" id="page-profile-settings" style="display:none; padding-top: calc(68px + env(safe-area-inset-top) + 20px); max-width: 600px; margin: 0 auto; color: #fff; text-align: center;">
         <h1 style="font-size: 2.5rem; margin-bottom: 30px;">Profile Settings</h1>
         
         <div style="background: #181818; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
@@ -564,7 +590,7 @@
     </div>
 
     <!-- View: Admin Dashboard -->
-    <div class="nf-page" id="page-admin-dashboard" style="display:none; padding-top: 100px; max-width: 900px; margin: 0 auto; color: #fff; padding-bottom: 50px;">
+    <div class="nf-page" id="page-admin-dashboard" style="display:none; padding-top: calc(68px + env(safe-area-inset-top) + 20px); max-width: 900px; margin: 0 auto; color: #fff; padding-bottom: 50px;">
         <div class="admin-header">
             <h1>Admin Dashboard</h1>
             <p>Manage content and activation codes</p>
@@ -641,119 +667,39 @@
     </div>
 
           <!-- ===================== MOBILE BOTTOM NAVIGATION ===================== -->
-    <div class="nf-bottom-nav">
-        <div class="nf-bottom-link active" data-page="home" onclick="showPage('home')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <nav class="nf-bottom-nav" id="bottom-nav">
+        <button class="nf-bottom-link active" data-page="home" id="bnav-home" onclick="showPage('home')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M9 22V12h6v10"></path></svg>
             <span>Home</span>
-        </div>
-        <div class="nf-bottom-link" data-page="games" onclick="showPage('games')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg>
-            <span>Michezo</span>
-        </div>
-
-
-        <div class="nf-bottom-link" onclick="showPage('profile-settings'); populateProfileSettings()">
-            <img src="assets/lion_mascot_1779138323522.png" alt="Profile" id="bottom-nav-avatar-img">
+        </button>
+        <button class="nf-bottom-link" data-page="search" id="bnav-search" onclick="showPage('search')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            <span>Explore</span>
+        </button>
+        <button class="nf-bottom-link" data-page="games" id="bnav-games" onclick="showPage('games')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><path d="M15 13h.01"></path><path d="M18 11h.01"></path></svg>
+            <span>Games</span>
+        </button>
+        <button class="nf-bottom-link" id="bnav-profile" onclick="showPage('profile-settings'); populateProfileSettings()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
             <span>Profile</span>
-        </div>
-        <div class="nf-bottom-link" id="bottom-nav-admin-link" style="display:none;" onclick="showPage('admin-dashboard')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span style="color:#e50914;">Admin</span>
-        </div>
-    </div>
-
-    <!-- ===================== PAGE: STORY BOOKS ===================== -->
-    <!-- ===================== PAGE: STORY BOOKS ===================== -->
-    <div class="nf-page" id="page-stories" style="display:none; padding-top: 80px; padding-bottom: 120px; color: #fff; position: relative;">
-        <!-- The bright joyful playroom background using CSS gradients -->
-        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, #a1c4fd 0%, #c2e9fb 100%); z-index: -2; overflow: hidden;">
-            <!-- Pure CSS fluffy clouds -->
-            <div style="position: absolute; width: 300px; height: 100px; background: #fff; border-radius: 100px; top: 10%; left: 10%; opacity: 0.9; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                <div style="position: absolute; width: 120px; height: 120px; background: #fff; border-radius: 50%; top: -60px; left: 40px;"></div>
-                <div style="position: absolute; width: 150px; height: 150px; background: #fff; border-radius: 50%; top: -80px; left: 120px;"></div>
-            </div>
-            <div style="position: absolute; width: 250px; height: 80px; background: #fff; border-radius: 100px; top: 25%; right: 5%; opacity: 0.8; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                <div style="position: absolute; width: 100px; height: 100px; background: #fff; border-radius: 50%; top: -50px; left: 30px;"></div>
-                <div style="position: absolute; width: 120px; height: 120px; background: #fff; border-radius: 50%; top: -60px; left: 100px;"></div>
-            </div>
-            <div style="position: absolute; width: 400px; height: 120px; background: #fff; border-radius: 100px; bottom: 5%; left: 50%; transform: translateX(-50%); opacity: 0.7; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                <div style="position: absolute; width: 160px; height: 160px; background: #fff; border-radius: 50%; top: -80px; left: 60px;"></div>
-                <div style="position: absolute; width: 200px; height: 200px; background: #fff; border-radius: 50%; top: -100px; left: 180px;"></div>
-            </div>
-        </div>
-        
-        <div style="position: relative; z-index: 1; text-align: center; margin-bottom: 60px; padding: 0 20px;">
-            <h1 style="font-size: 4rem; font-weight: 900; color: #FF416C; text-shadow: 3px 3px 0px #fff, 6px 6px 0px rgba(0,0,0,0.1); margin-bottom: 10px; letter-spacing: 2px;">Ã°Å¸â€œÅ¡ Story Books</h1>
-            <p style="color: #333; font-size: 1.5rem; font-weight: bold; text-shadow: 2px 2px 0px #fff;">Pick a book and go on an adventure!</p>
-        </div>
-        
-        <div style="position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 40px;">
-            <div id="stories-shelf" class="magic-shelves-grid">
-                <!-- Injected by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ===================== BOOK READER ===================== -->
-    <div id="book-reader-overlay" style="display:none; position:fixed; inset:0; background: radial-gradient(circle at center, #d8a878 0%, #8c5a35 100%); z-index:200000; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 150px rgba(0,0,0,0.6);">
-        <!-- Wooden grain texture overlay -->
-        <div style="position: absolute; inset: 0; background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(0,0,0,0.04) 15px, rgba(0,0,0,0.04) 30px); pointer-events: none; z-index: -1;"></div>
-
-        <!-- Header bar -->
-        <div id="book-reader-header" style="position:absolute; top:0; left:0; right:0; padding: 15px 20px; display:flex; align-items:center; justify-content:space-between; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 10;">
-            <button onclick="closeBook()" style="background: rgba(255,255,255,0.1); border: none; color:#fff; padding: 10px 18px; border-radius: 20px; cursor:pointer; font-size: 1rem; display:flex; align-items:center; gap:8px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                Ã¢â€ Â Back
-            </button>
-            <div id="book-reader-title-bar" style="font-size: 1.1rem; font-weight: 700; color: #fff; text-align: center; flex:1; padding: 0 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
-            <button onclick="readCurrentPageAloud()" id="read-aloud-btn" style="background: #e50914; border: none; color:#fff; padding: 10px 18px; border-radius: 20px; cursor:pointer; font-size: 1rem; display:flex; align-items:center; gap:8px; transition: background 0.2s; white-space: nowrap;" onmouseover="this.style.background='#c0070f'" onmouseout="this.style.background='#e50914'">
-                Ã°Å¸â€Å  Read to Me
-            </button>
-        </div>
-
-        <!-- The Book -->
-        <div id="book-stage" style="position: relative; width: 100%; max-width: 950px; padding: 80px 20px 100px; display: flex; align-items: center; justify-content: center;">
-            <div id="book-container" style="position: relative; width: 100%; max-width: 900px;">
-                <!-- Pages rendered by JS -->
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <div id="book-nav" style="position: absolute; bottom: 0; left:0; right:0; padding: 15px 20px; display:flex; align-items:center; justify-content:space-between; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
-            <button id="book-prev-btn" onclick="bookPrevPage()" style="background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); color:#fff; padding: 12px 25px; border-radius: 25px; cursor:pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-                Ã¢â€”â‚¬ Prev
-            </button>
-            <div id="book-page-indicator" style="color: #ccc; font-size: 1rem; font-weight: 600;"></div>
-            <button id="book-next-btn" onclick="bookNextPage()" style="background: #e50914; border: none; color:#fff; padding: 12px 25px; border-radius: 25px; cursor:pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='#c0070f'" onmouseout="this.style.background='#e50914'">
-                Next Ã¢â€“Â¶
-            </button>
-        </div>
-    </div>
-
-
-
-
-
-
-
-
-    <!-- ===================== ANIMAL STORY MODAL ===================== -->
-    <div id="animal-story-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100000; align-items:center; justify-content:center; padding: 20px;">
-        <div style="background: var(--nf-dark); border-radius: 16px; padding: 30px; max-width: 500px; width: 100%; text-align: center; position: relative; border: 2px solid #e50914; box-shadow: 0 10px 30px rgba(229,9,20,0.3);">
-            <button onclick="closeAnimalStory()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #fff; cursor: pointer;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <div id="animal-story-emoji" style="margin-bottom: 20px;"></div>
-            <h2 id="animal-story-title" style="color: #fff; font-size: 2.5rem; margin-bottom: 15px; font-weight: 800;"></h2>
-            <p id="animal-story-text" style="color: #ccc; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px;"></p>
-            <button onclick="closeAnimalStory()" style="background: #e50914; color: #fff; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.3s;">Awesome!</button>
-        </div>
-    </div>
+        </button>
+        <button class="nf-bottom-link" id="bottom-nav-admin-link" style="display:none;" onclick="showPage('admin-dashboard')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Admin</span>
+        </button>
+    </nav>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="js/supabase.js"></script>
     <script src="js/songs.js"></script>
-    <script src="js/app.js?v=10"></script>
+    <script src="js/app.js?v=17"></script>
 </body>
 </html>
+
+
+
+
+
 
 

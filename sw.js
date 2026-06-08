@@ -1,8 +1,8 @@
-const CACHE_NAME = 'totomelodies-v3';
+const CACHE_NAME = 'totomelodies-v20';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './css/style.css?v=10',
+  './css/style_v2.css',
   './js/app.js?v=10',
   './js/songs.js',
   './js/supabase.js',
@@ -43,3 +43,11 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
+
+
+
+
+
+
+
