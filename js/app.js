@@ -60,7 +60,8 @@ function saveVideoProgress(videoId, currentTime, duration) {
 document.addEventListener('DOMContentLoaded', () => {
     // Scroll nav
     window.addEventListener('scroll', () => {
-        document.getElementById('main-nav').classList.toggle('solid', window.scrollY > 60);
+        const mainNav = document.getElementById('main-nav');
+        if (mainNav) mainNav.classList.toggle('solid', window.scrollY > 60);
     });
 
     // Video player events

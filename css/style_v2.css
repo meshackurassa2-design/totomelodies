@@ -146,6 +146,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
     padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important;
 }
 
@@ -3264,8 +3265,7 @@ body.game-playing .nf-bottom-nav {
 /* Hide Scrollbars and Prevent Horizontal Scroll */
 html, body {
     overflow: hidden;
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     width: 100vw;
     max-width: 100%;
     margin: 0;
@@ -3273,6 +3273,7 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
+    overscroll-behavior: none;
 }
 ::-webkit-scrollbar {
     display: none;
