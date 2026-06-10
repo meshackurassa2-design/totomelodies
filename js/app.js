@@ -710,7 +710,7 @@ function buildPiano() {
         } else {
             leftOffset += whiteWidth;
         }
-        const play = () => { playTone(n.freq, 'sine', 0.5); key.classList.add('highlight'); setTimeout(() => key.classList.remove('highlight'), 200); };
+        const play = () => { playTone(n.freq, 'triangle', 0.6); key.classList.add('highlight'); setTimeout(() => key.classList.remove('highlight'), 200); };
         key.addEventListener('mousedown', play);
         key.addEventListener('touchstart', e => { e.preventDefault(); play(); }, { passive: false });
         wrapper.appendChild(key);
@@ -744,7 +744,7 @@ function buildXylo() {
         bar.className = 'xylo-bar';
         bar.style.background = xyloColors[i % xyloColors.length];
         bar.style.height = `${100 - i * 7}%`;
-        const play = () => { playTone(n.freq, 'sine', 0.4); };
+        const play = () => { playTone(n.freq, 'square', 0.15); };
         bar.addEventListener('mousedown', play);
         bar.addEventListener('touchstart', e => { e.preventDefault(); play(); }, { passive: false });
         wrapper.appendChild(bar);
