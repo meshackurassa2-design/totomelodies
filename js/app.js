@@ -857,6 +857,8 @@ function openDetailModal(video) {
     const modal = document.getElementById('video-detail-modal');
     document.getElementById('detail-backdrop').src = video.thumbnail_url;
     document.getElementById('detail-title').textContent = video.title;
+    const durationEl = document.getElementById('detail-duration');
+    if (durationEl) durationEl.textContent = video.duration || '1h 30m';
     document.getElementById('detail-description').textContent =
         videoDescriptions[video.id % videoDescriptions.length] || videoDescriptions[0];
 
@@ -877,46 +879,30 @@ function openDetailModal(video) {
         playBtnText.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Play';
     }
 
+    // Rate toggle
+    const rateBtn = document.getElementById('detail-rate-btn');
+    if (rateBtn) {
+        const icon = document.getElementById('detail-rate-icon');
+        const text = document.getElementById('detail-rate-text');
+        icon.setAttribute('fill', 'none');
+        text.textContent = 'Rate';
+        
+        window.toggleRate = function() {
+            const currentFill = icon.getAttribute('fill');
+            if (currentFill === 'none') {
+                icon.setAttribute('fill', 'currentColor');
+                text.textContent = 'Rated!';
+            } else {
+                icon.setAttribute('fill', 'none');
+                text.textContent = 'Rate';
+            }
+        };
+    }
+
     // Play button
     document.getElementById('detail-play-btn').onclick = () => {
         closeDetailModal();
         openVideoPlayer(video.video_url, video.title, video.id);
-    };
-
-    // Download button
-    document.getElementById('detail-download-btn').onclick = async () => {
-        const btn = document.getElementById('detail-download-btn');
-        const origHtml = btn.innerHTML;
-        btn.innerHTML = 'Downloading...';
-        try {
-            const res = await fetch(video.video_url);
-            if (!res.ok) throw new Error('Network error');
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = (video.title || 'video').replace(/[^a-z0-9]/gi, '_') + '.mp4';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (e) {
-            console.error('Download failed:', e);
-            alert("Could not download video directly. It may open in a new tab instead.");
-            window.open(video.video_url, '_blank');
-        }
-        btn.innerHTML = origHtml;
-    };
-
-    // Watchlist toggle
-    const wl = document.getElementById('detail-watchlist-btn');
-    const inList = isInWatchlist(video.id);
-    wl.style.opacity = inList ? '1' : '0.8';
-    // setWatchlistIcon(wl, inList);
-    wl.onclick = () => {
-        const nowIn = toggleWatchlist(video);
-        wl.style.opacity = nowIn ? '1' : '0.8';
     };
 
     // More Like This
@@ -1141,17 +1127,31 @@ async function loadAdminDashboard() {
     let html = '';
     dbVideos.forEach(v => {
         html += `
-            <div style="background:#333; border-radius:8px; overflow:hidden;">
+            <div style="background:#333; border-radius:8px; overflow:hidden; margin-bottom:15px;">
                 <img src="${v.thumbnail_url}" style="width:100%; height:120px; object-fit:cover;">
-                <div style="padding:10px;">
-                    <div style="font-weight:bold; font-size:1.1rem; margin-bottom:5px;">${v.title}</div>
-                    <div style="font-size:0.9rem; color:#888;">${v.category}</div>
+                <div style="padding:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:bold; font-size:1.1rem; margin-bottom:5px;">${v.title}</div>
+                        <div style="font-size:0.9rem; color:#888;">${v.category}</div>
+                    </div>
+                    <button onclick="deleteAdminVideo('${v.id}', '${v.video_url}', '${v.thumbnail_url}')" style="background:#e50914; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;">Delete</button>
                 </div>
             </div>
         `;
     });
     list.innerHTML = html;
 }
+
+window.deleteAdminVideo = async function(id, videoUrl, thumbnailUrl) {
+    if (!confirm("Are you sure you want to delete this video? This cannot be undone.")) return;
+    
+    const success = await deleteVideoFromDatabase(id, videoUrl, thumbnailUrl);
+    if (success) {
+        alert("Video deleted successfully.");
+        loadAdminDashboard();
+        if (typeof loadAndRenderVideos === 'function') loadAndRenderVideos();
+    }
+};
 
 // Expose showPage globally so HTML onclick attributes can call it
 const _internalShowPage = showPage; // capture BEFORE window override
@@ -1163,7 +1163,7 @@ window.showPage = function(pageId) {
         }
         loadAdminDashboard();
     }
-    _internalShowPage(pageId); // call original ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â no recursion
+    _internalShowPage(pageId); // call original ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â  no recursion
     if (pageId !== 'profiles') {
         const pScreen = document.getElementById('profiles-create-view');
         if (pScreen) pScreen.style.display = 'none';
@@ -1189,6 +1189,7 @@ async function submitAdminVideo() {
         const desc = descEl ? descEl.value.trim() : '';
         const cat = document.getElementById('admin-video-category')?.value;
         const releaseDate = document.getElementById('admin-video-date')?.value || null;
+        const length = document.getElementById('admin-video-length')?.value || null;
         
         errorEl.textContent = '';
         errorEl.style.color = '#e50914';
@@ -1239,7 +1240,8 @@ async function submitAdminVideo() {
             thumbnail_url: thumbUrl,
             description: desc,
             category: cat,
-            release_date: releaseDate
+            release_date: releaseDate,
+            duration: length
         });
         
         if (success) {

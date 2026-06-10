@@ -235,7 +235,9 @@ function subscribeToVideos() {
 
 /* ===================== ADMIN & VIDEO MANAGEMENT ===================== */
 function isAdmin() {
-    return currentAuthUser && currentAuthUser.email && currentAuthUser.email.toLowerCase() === 'meshackurassa2@gmail.com';
+    if (!currentAuthUser || !currentAuthUser.email) return false;
+    const email = currentAuthUser.email.toLowerCase();
+    return email === 'meshackurassa2@gmail.com' || email === 'onlinedoctor906@gmail.com';
 }
 
 async function fetchVideosFromDatabase() {
@@ -252,7 +254,7 @@ async function fetchVideosFromDatabase() {
 
 async function uploadVideoToDatabase(videoData) {
     if (!isAdmin()) {
-        alert("Access Denied: Only meshackurassa2@gmail.com can post videos.");
+        alert("Access Denied: Only admins can post videos.");
         return false;
     }
     
@@ -264,7 +266,8 @@ async function uploadVideoToDatabase(videoData) {
             thumbnail_url: videoData.thumbnail_url,
             video_url: videoData.video_url,
             category: videoData.category,
-            release_date: videoData.release_date || null
+            release_date: videoData.release_date || null,
+            duration: videoData.duration || null
         }
     ]);
     
@@ -274,6 +277,37 @@ async function uploadVideoToDatabase(videoData) {
         return false;
     }
     
+    return true;
+}
+
+async function deleteVideoFromDatabase(id, videoUrl, thumbnailUrl) {
+    if (!isAdmin()) {
+        alert("Access Denied: Only admins can delete videos.");
+        return false;
+    }
+    const sb = getSB();
+    
+    // Attempt to delete files from storage
+    try {
+        if (videoUrl && videoUrl.includes('/videos/')) {
+            const vidPath = videoUrl.substring(videoUrl.indexOf('/videos/') + 8);
+            await sb.storage.from('videos').remove([vidPath]);
+        }
+        if (thumbnailUrl && thumbnailUrl.includes('/videos/')) {
+            const thumbPath = thumbnailUrl.substring(thumbnailUrl.indexOf('/videos/') + 8);
+            await sb.storage.from('videos').remove([thumbPath]);
+        }
+    } catch(e) {
+        console.error("Storage delete error:", e);
+    }
+    
+    // Delete database row
+    const { error } = await sb.from('videos').delete().eq('id', id);
+    if (error) {
+        console.error("Delete error:", error);
+        alert("Delete error: " + error.message);
+        return false;
+    }
     return true;
 }
 
@@ -339,8 +373,8 @@ async function submitActivationCode() {
 }
 
 async function adminGenerateCode() {
-    if (!isAdmin()) {
-        alert("Access Denied: Admin only.");
+    if (!currentAuthUser || currentAuthUser.email.toLowerCase() !== 'meshackurassa2@gmail.com') {
+        alert("geneart on supabase only secound admin");
         return;
     }
 

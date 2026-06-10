@@ -143,8 +143,27 @@
     </div>
 </div>
 
-<!-- Header removed as requested -->
-    
+<!-- ===================== DESKTOP NAVIGATION ===================== -->
+    <nav class="nf-nav desktop-nav" id="main-nav">
+        <div class="nf-nav-left">
+            <div class="nf-logo" onclick="switchPage('home')">TotoMelodies</div>
+            <ul class="nf-nav-links">
+                <li class="nf-nav-link active" onclick="switchPage('home')">Home</li>
+                <li class="nf-nav-link" onclick="switchPage('home'); filterCategory(document.querySelector('.tm-cat-btn[data-cat=\'videos\']'), 'videos')">Videos</li>
+                <li class="nf-nav-link" onclick="switchPage('games')">Games</li>
+                <li class="nf-nav-link" id="nav-admin-link" onclick="switchPage('admin-dashboard')" style="display:none;">Admin</li>
+            </ul>
+        </div>
+        <div class="nf-nav-right">
+            <div class="nf-search-btn" onclick="switchPage('search')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+            <div class="nf-avatar" onclick="switchPage('profile-settings')">
+                <img src="assets/lion_mascot_1779138323522.png" id="nav-avatar-img" alt="Profile">
+                <svg class="nf-avatar-caret" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 10 12 15 17 10"></polygon></svg>
+            </div>
+        </div>
+    </nav>
 
 <!-- Search Bar moved to dedicated page -->
 
@@ -487,7 +506,7 @@
         </div>
         
         <div class="nf-detail-body">
-            <div class="nf-detail-brand"><span style="color: #e50914; font-weight: 800; margin-right: 5px; font-size: 1.1rem;">N</span> <span style="letter-spacing: 2px; font-size: 0.75rem; color: #aaa; font-weight: 600;">FILM</span></div>
+            <div class="nf-detail-brand"><span style="color: #e50914; font-weight: 800; margin-right: 2px; font-size: 1.1rem;">T</span><span style="letter-spacing: 2px; font-size: 0.75rem; color: #fff; font-weight: 600;">OTO</span></div>
             <h2 class="nf-detail-title-mobile" id="detail-title"></h2>
             
             <div class="nf-detail-meta-mobile">
@@ -501,10 +520,6 @@
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 Play
             </button>
-            <button class="nf-btn-block nf-btn-download-block" id="detail-download-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Download
-            </button>
             
             <div class="nf-detail-progress" id="detail-progress-container" style="display:none;">
                 <div class="nf-detail-progress-bar"><div class="nf-detail-progress-fill" id="detail-progress-fill"></div></div>
@@ -515,24 +530,15 @@
             <div class="nf-detail-cast">Cast: <span id="detail-cast">Toto, Simba, Ndovu</span></div>
             <div class="nf-detail-director">Director: <span id="detail-director">TotoMelodies Studios</span></div>
             
-            <div class="nf-detail-action-bar">
-                <div class="nf-action-item" id="detail-watchlist-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>My List</span>
-                </div>
-                <div class="nf-action-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"></path><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                    <span>Rate</span>
-                </div>
-                <div class="nf-action-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    <span>Share</span>
+            <div class="nf-detail-action-bar" style="justify-content: flex-start; gap: 40px;">
+                <div class="nf-action-item" id="detail-rate-btn" onclick="toggleRate()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="detail-rate-icon"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"></path><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    <span id="detail-rate-text">Rate</span>
                 </div>
             </div>
             
             <div class="nf-detail-tabs">
-                <div class="nf-tab active">More Like This</div>
-                <div class="nf-tab">Trailers</div>
+                <div class="nf-detail-tab active">MORE LIKE THIS</div>
             </div>
             
             <div class="nf-detail-similar-mobile">
@@ -600,9 +606,13 @@
                     <label>Description</label>
                     <textarea id="admin-video-desc" placeholder="A short description..." rows="4"></textarea>
                 </div>
-                                <div class="admin-input-group">
+                <div class="admin-input-group">
                     <label>Release Date</label>
                     <input type="date" id="admin-video-date" style="color: #fff; background: #333; border: 1px solid #444; padding: 12px; border-radius: 4px; box-sizing: border-box; width: 100%; font-size: 1rem;">
+                </div>
+                <div class="admin-input-group">
+                    <label>Duration/Length</label>
+                    <input type="text" id="admin-video-length" placeholder="e.g. 1h 30m" style="color: #fff; background: #333; border: 1px solid #444; padding: 12px; border-radius: 4px; box-sizing: border-box; width: 100%; font-size: 1rem;">
                 </div>
                 <div class="admin-input-group">
                     <label>Category</label>

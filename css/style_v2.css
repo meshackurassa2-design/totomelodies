@@ -21,7 +21,6 @@ body {
     color: var(--nf-text);
     font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     min-height: 100vh;
-    overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -141,12 +140,8 @@ body {
 
 /* ===== PAGES ===== */
 .nf-page {
-    height: 100%;
+    min-height: 100vh;
     width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: none;
     padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important;
 }
 
@@ -2622,6 +2617,72 @@ body.video-playing .nf-nav {
     overflow: hidden;
 }
 
+/* ========================================================
+   DESKTOP RESPONSIVE LAYOUT (Web App Experience)
+   ======================================================== */
+.desktop-nav {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    /* Show desktop nav */
+    .desktop-nav {
+        display: flex !important;
+    }
+    
+    /* Make video grids wider */
+    .nf-card {
+        flex: 0 0 calc(100% / 4 - 8px); /* 4 items per row */
+    }
+    
+    /* Center and constrain main pages */
+    .nf-page {
+        padding-top: 80px !important; /* space for top nav */
+    }
+    
+    /* Billboard adjustments for wider screens */
+    .nf-billboard {
+        height: 80vh;
+    }
+    .billboard-content {
+        bottom: 25%;
+        width: 45%;
+    }
+    .billboard-synopsis {
+        font-size: 1.2rem;
+    }
+    
+    /* Detail Modal Desktop Cinematic Layout */
+    .nf-detail-mobile-layout {
+        max-width: 850px;
+        margin: 40px auto;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .nf-detail-header-img img {
+        height: 450px; /* Much larger image */
+    }
+    
+    /* Make Games grid better */
+    .games-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    /* Admin dashboard width */
+    #page-admin-dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 1200px) {
+    /* 5-6 items per row on very large screens */
+    .nf-card {
+        flex: 0 0 calc(100% / 5 - 10px);
+    }
+}
 #story-reader-modal::-webkit-scrollbar {
     display: none;
 }
